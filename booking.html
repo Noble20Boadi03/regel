@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment | Regel Glit Glam</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --emerald: #0a5c36;
+        --emerald-light: #0d7a48;
+        --gold: #d4af37;
+        --rose-gold: #b76e79;
+        --cream: #f8f5f0;
+        --dark: #1a1a1a;
+        --gray: #6c757d;
+        --light-gray: #e9ecef;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Raleway", sans-serif;
+        line-height: 1.6;
+        color: var(--dark);
+        background-color: var(--cream);
+        overflow-x: hidden;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        font-family: "Playfair Display", serif;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background: var(--emerald);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .btn:hover {
+        background: var(--emerald-light);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-gold {
+        background: var(--gold);
+        color: var(--dark);
+      }
+
+      .btn-gold:hover {
+        background: #e6c158;
+      }
+
+      /* Header & Navigation */
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .header-scrolled {
+        background: rgba(255, 255, 255, 0.98);
+        padding: 10px 0;
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      .logo {
+        font-family: "Playfair Display", serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--emerald);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo i {
+        color: var(--gold);
+        margin-right: 8px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+      }
+
+      .nav-links li {
+        margin-left: 30px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 500;
+        font-size: 16px;
+        transition: color 0.3s ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--emerald);
+      }
+
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--emerald);
+      }
+
+      /* Page Header */
+      .page-header {
+        background: linear-gradient(
+            rgba(10, 92, 54, 0.8),
+            rgba(10, 92, 54, 0.6)
+          ),
+          url("https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80")
+            no-repeat center center/cover;
+        height: 40vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        margin-top: 80px;
+      }
+
+      .page-header h1 {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .page-header p {
+        font-size: 1.2rem;
+        max-width: 600px;
+      }
+
+      /* Booking Section */
+      .section {
+        padding: 80px 0;
+      }
+
+      .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .section-title h2 {
+        font-size: 2.5rem;
+        color: var(--emerald);
+        position: relative;
+        display: inline-block;
+        margin-bottom: 15px;
+      }
+
+      .section-title h2:after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: var(--gold);
+      }
+
+      .section-title p {
+        color: var(--gray);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .booking-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .booking-form {
+        padding: 40px;
+      }
+
+      .booking-info {
+        background: linear-gradient(135deg, var(--emerald) 0%, #083c24 100%);
+        color: white;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--dark);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--light-gray);
+        border-radius: 4px;
+        font-family: "Raleway", sans-serif;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--emerald);
+        outline: none;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .service-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .service-option {
+        border: 2px solid var(--light-gray);
+        border-radius: 6px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .service-option:hover {
+        border-color: var(--emerald);
+      }
+
+      .service-option.selected {
+        border-color: var(--emerald);
+        background-color: rgba(10, 92, 54, 0.05);
+      }
+
+      .service-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--emerald);
+      }
+
+      .service-price {
+        color: var(--gold);
+        font-weight: 600;
+      }
+
+      .service-duration {
+        font-size: 0.9rem;
+        color: var(--gray);
+      }
+
+      .time-slots {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .time-slot {
+        padding: 10px;
+        border: 1px solid var(--light-gray);
+        border-radius: 4px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .time-slot:hover {
+        border-color: var(--emerald);
+      }
+
+      .time-slot.selected {
+        background: var(--emerald);
+        color: white;
+        border-color: var(--emerald);
+      }
+
+      .time-slot.unavailable {
+        background: var(--light-gray);
+        color: #aaa;
+        cursor: not-allowed;
+      }
+
+      .booking-summary {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 25px;
+        margin-top: 30px;
+      }
+
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 25px;
+      }
+
+      .info-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--gold);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+        font-size: 20px;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--dark);
+        color: white;
+        padding: 70px 0 20px;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 40px;
+        margin-bottom: 50px;
+      }
+
+      .footer-column h3 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: var(--gold);
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 10px;
+      }
+
+      .footer-links a {
+        color: #bbb;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .footer-links a:hover {
+        color: var(--gold);
+      }
+
+      .social-links {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .social-links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        color: white;
+        text-decoration: none;
+        transition: background 0.3s ease;
+      }
+
+      .social-links a:hover {
+        background: var(--gold);
+        color: var(--dark);
+      }
+
+      .copyright {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #bbb;
+        font-size: 14px;
+      }
+
+      /* Confirmation Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 10px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        animation: modalFade 0.3s ease;
+      }
+
+      @keyframes modalFade {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-icon {
+        font-size: 60px;
+        color: var(--emerald);
+        margin-bottom: 20px;
+      }
+
+      .modal h2 {
+        color: var(--emerald);
+        margin-bottom: 15px;
+      }
+
+      .modal p {
+        margin-bottom: 25px;
+        color: var(--gray);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 992px) {
+        .booking-container {
+          grid-template-columns: 1fr;
+        }
+
+        .time-slots {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navbar {
+          padding: 15px 0;
+        }
+
+        .nav-links {
+          position: fixed;
+          top: 70px;
+          left: -100%;
+          width: 100%;
+          height: calc(100vh - 70px);
+          background: white;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          padding-top: 50px;
+          transition: left 0.3s ease;
+        }
+
+        .nav-links.active {
+          left: 0;
+        }
+
+        .nav-links li {
+          margin: 0 0 30px 0;
+        }
+
+        .mobile-menu-btn {
+          display: block;
+        }
+
+        .page-header h1 {
+          font-size: 2.2rem;
+        }
+
+        .section {
+          padding: 60px 0;
+        }
+
+        .section-title h2 {
+          font-size: 2rem;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .service-options {
+          grid-template-columns: 1fr;
+        }
+
+        .time-slots {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 576px) {
+        .page-header h1 {
+          font-size: 1.8rem;
+        }
+
+        .page-header p {
+          font-size: 1rem;
+        }
+
+        .btn {
+          padding: 10px 20px;
+          font-size: 14px;
+        }
+
+        .booking-form,
+        .booking-info {
+          padding: 25px;
+        }
+
+        .time-slots {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header & Navigation -->
+    <header id="header">
+      <div class="container">
+        <nav class="navbar">
+          <a href="regel.html" class="logo">
+            <i class="fas fa-spa"></i>
+            Regel Glit Glam
+          </a>
+          <ul class="nav-links">
+            <li><a href="regel.html#home">Home</a></li>
+            <li><a href="regel.html#services">Services</a></li>
+            <li><a href="booking.html">Book Now</a></li>
+            <li><a href="regel.html#gallery">Gallery</a></li>
+            <li><a href="regel.html#team">Our Team</a></li>
+            <li><a href="regel.html#contact">Contact</a></li>
+          </ul>
+          <button class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="container">
+        <h1>Book Your Appointment</h1>
+        <p>
+          Schedule your visit to our premium beauty salon and experience luxury
+          beauty care
+        </p>
+      </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section class="section" id="booking">
+      <div class="container">
+        <div class="section-title">
+          <h2>Schedule Your Visit</h2>
+          <p>
+            Fill out the form below to book your appointment at Regel Glit Glam
+          </p>
+        </div>
+
+        <div class="booking-container">
+          <div class="booking-form">
+            <form id="bookingForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName">First Name</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Last Name</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email">Email Address</label>
+                  <input
+                    type="email"
+                    id="email"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input type="tel" id="phone" class="form-control" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="service">Select Service</label>
+                <div class="service-options">
+                  <div class="service-option" data-service="hair-styling">
+                    <div class="service-name">Hair Styling</div>
+                    <div class="service-price">From $75</div>
+                    <div class="service-duration">60-90 min</div>
+                  </div>
+                  <div class="service-option" data-service="manicure">
+                    <div class="service-name">Manicure & Pedicure</div>
+                    <div class="service-price">From $45</div>
+                    <div class="service-duration">45-75 min</div>
+                  </div>
+                  <div class="service-option" data-service="facial">
+                    <div class="service-name">Facial Treatment</div>
+                    <div class="service-price">From $90</div>
+                    <div class="service-duration">60 min</div>
+                  </div>
+                  <div class="service-option" data-service="makeup">
+                    <div class="service-name">Makeup Artistry</div>
+                    <div class="service-price">From $65</div>
+                    <div class="service-duration">45-90 min</div>
+                  </div>
+                </div>
+                <input
+                  type="hidden"
+                  id="selectedService"
+                  name="service"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="date">Preferred Date</label>
+                <input
+                  type="date"
+                  id="date"
+                  class="form-control"
+                  min=""
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="time">Preferred Time</label>
+                <div class="time-slots">
+                  <div class="time-slot" data-time="09:00">9:00 AM</div>
+                  <div class="time-slot" data-time="10:00">10:00 AM</div>
+                  <div class="time-slot" data-time="11:00">11:00 AM</div>
+                  <div class="time-slot" data-time="12:00">12:00 PM</div>
+                  <div class="time-slot" data-time="13:00">1:00 PM</div>
+                  <div class="time-slot" data-time="14:00">2:00 PM</div>
+                  <div class="time-slot" data-time="15:00">3:00 PM</div>
+                  <div class="time-slot" data-time="16:00">4:00 PM</div>
+                  <div class="time-slot unavailable" data-time="17:00">
+                    5:00 PM
+                  </div>
+                  <div class="time-slot" data-time="18:00">6:00 PM</div>
+                </div>
+                <input type="hidden" id="selectedTime" name="time" required />
+              </div>
+
+              <div class="form-group">
+                <label for="specialRequests">Special Requests (Optional)</label>
+                <textarea
+                  id="specialRequests"
+                  class="form-control"
+                  rows="4"
+                  placeholder="Any special requirements or notes for our team..."
+                ></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-gold" style="width: 100%">
+                Book Appointment
+              </button>
+            </form>
+          </div>
+
+          <div class="booking-info">
+            <h3 style="color: white; margin-bottom: 25px">
+              Booking Information
+            </h3>
+
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="far fa-calendar-check"></i>
+              </div>
+              <div>
+                <h4>Easy Scheduling</h4>
+                <p>
+                  Select your preferred date and time from our available slots
+                </p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="far fa-clock"></i>
+              </div>
+              <div>
+                <h4>Flexible Hours</h4>
+                <p>We're open Monday to Saturday with extended evening hours</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="fas fa-user-check"></i>
+              </div>
+              <div>
+                <h4>Expert Stylists</h4>
+                <p>
+                  Our certified professionals will ensure you get the best
+                  service
+                </p>
+              </div>
+            </div>
+
+            <div class="booking-summary">
+              <h4 style="margin-bottom: 20px">Appointment Summary</h4>
+              <div class="summary-item">
+                <span>Service:</span>
+                <span id="summary-service">-</span>
+              </div>
+              <div class="summary-item">
+                <span>Date:</span>
+                <span id="summary-date">-</span>
+              </div>
+              <div class="summary-item">
+                <span>Time:</span>
+                <span id="summary-time">-</span>
+              </div>
+              <div class="summary-item">
+                <span>Duration:</span>
+                <span id="summary-duration">-</span>
+              </div>
+              <div class="summary-total">
+                <span>Total:</span>
+                <span id="summary-total">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-column">
+            <h3>Regel Glit Glam</h3>
+            <p>
+              Your premier destination for luxury beauty treatments and
+              exceptional service in a sophisticated environment.
+            </p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-pinterest-p"></i></a>
+              <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+          </div>
+          <div class="footer-column">
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+              <li><a href="regel.html#home">Home</a></li>
+              <li><a href="regel.html#services">Services</a></li>
+              <li><a href="booking">Book Appointment</a></li>
+              <li><a href="regel.html#gallery">Gallery</a></li>
+              <li><a href="regel.html#team">Our Team</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Services</h3>
+            <ul class="footer-links">
+              <li><a href="#">Hair Styling</a></li>
+              <li><a href="#">Hair Coloring</a></li>
+              <li><a href="#">Manicure & Pedicure</a></li>
+              <li><a href="#">Facial Treatments</a></li>
+              <li><a href="#">Makeup Artistry</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Contact Info</h3>
+            <ul class="footer-links">
+              <li>
+                <i class="fas fa-map-marker-alt"></i> 123 Beauty Avenue, NY
+                10001
+              </li>
+              <li><i class="fas fa-phone"></i> (555) 123-4567</li>
+              <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
+            </ul>
+          </div>
+        </div>
+        <div class="copyright">
+          <p>&copy; 2023 Regel Glit Glam Beauty Salon. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+      <div class="modal-content">
+        <div class="modal-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Appointment Confirmed!</h2>
+        <p>
+          Thank you for booking with Regel Glit Glam. We've sent a confirmation
+          email with your appointment details.
+        </p>
+        <p><strong>Date:</strong> <span id="confirm-date"></span></p>
+        <p><strong>Time:</strong> <span id="confirm-time"></span></p>
+        <p><strong>Service:</strong> <span id="confirm-service"></span></p>
+        <button class="btn btn-gold" id="closeModal">Close</button>
+      </div>
+    </div>
+
+    <script>
+      // Mobile Menu Toggle
+      const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
+      const navLinks = document.querySelector(".nav-links");
+
+      mobileMenuBtn.addEventListener("click", () => {
+        navLinks.classList.toggle("active");
+        mobileMenuBtn.innerHTML = navLinks.classList.contains("active")
+          ? '<i class="fas fa-times"></i>'
+          : '<i class="fas fa-bars"></i>';
+      });
+
+      // Header Scroll Effect
+      window.addEventListener("scroll", () => {
+        const header = document.getElementById("header");
+        if (window.scrollY > 100) {
+          header.classList.add("header-scrolled");
+        } else {
+          header.classList.remove("header-scrolled");
+        }
+      });
+
+      // Set minimum date to today
+      const dateInput = document.getElementById("date");
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.min = today;
+
+      // Service Selection
+      const serviceOptions = document.querySelectorAll(".service-option");
+      const selectedServiceInput = document.getElementById("selectedService");
+
+      serviceOptions.forEach((option) => {
+        option.addEventListener("click", () => {
+          // Remove selected class from all options
+          serviceOptions.forEach((opt) => opt.classList.remove("selected"));
+
+          // Add selected class to clicked option
+          option.classList.add("selected");
+
+          // Update hidden input value
+          selectedServiceInput.value = option.getAttribute("data-service");
+
+          // Update booking summary
+          updateBookingSummary();
+        });
+      });
+
+      // Time Slot Selection
+      const timeSlots = document.querySelectorAll(
+        ".time-slot:not(.unavailable)"
+      );
+      const selectedTimeInput = document.getElementById("selectedTime");
+
+      timeSlots.forEach((slot) => {
+        slot.addEventListener("click", () => {
+          // Remove selected class from all time slots
+          timeSlots.forEach((s) => s.classList.remove("selected"));
+
+          // Add selected class to clicked slot
+          slot.classList.add("selected");
+
+          // Update hidden input value
+          selectedTimeInput.value = slot.getAttribute("data-time");
+
+          // Update booking summary
+          updateBookingSummary();
+        });
+      });
+
+      // Update Booking Summary
+      function updateBookingSummary() {
+        const serviceElement = document.querySelector(
+          ".service-option.selected"
+        );
+        const dateValue = dateInput.value;
+        const timeElement = document.querySelector(".time-slot.selected");
+
+        if (serviceElement) {
+          const serviceName =
+            serviceElement.querySelector(".service-name").textContent;
+          const servicePrice =
+            serviceElement.querySelector(".service-price").textContent;
+          const serviceDuration =
+            serviceElement.querySelector(".service-duration").textContent;
+
+          document.getElementById("summary-service").textContent = serviceName;
+          document.getElementById("summary-duration").textContent =
+            serviceDuration;
+          document.getElementById("summary-total").textContent = servicePrice;
+        }
+
+        if (dateValue) {
+          const formattedDate = new Date(dateValue).toLocaleDateString(
+            "en-US",
+            {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }
+          );
+          document.getElementById("summary-date").textContent = formattedDate;
+        }
+
+        if (timeElement) {
+          document.getElementById("summary-time").textContent =
+            timeElement.textContent;
+        }
+      }
+
+      // Update summary when date changes
+      dateInput.addEventListener("change", updateBookingSummary);
+
+      // Form Submission
+      const bookingForm = document.getElementById("bookingForm");
+      const confirmationModal = document.getElementById("confirmationModal");
+
+      bookingForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        // Validate form
+        if (!selectedServiceInput.value) {
+          alert("Please select a service");
+          return;
+        }
+
+        if (!selectedTimeInput.value) {
+          alert("Please select a time slot");
+          return;
+        }
+
+        // Get form values for confirmation
+        const serviceElement = document.querySelector(
+          ".service-option.selected"
+        );
+        const serviceName =
+          serviceElement.querySelector(".service-name").textContent;
+        const dateValue = dateInput.value;
+        const formattedDate = new Date(dateValue).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const timeValue = document.querySelector(
+          ".time-slot.selected"
+        ).textContent;
+
+        // Set confirmation details
+        document.getElementById("confirm-service").textContent = serviceName;
+        document.getElementById("confirm-date").textContent = formattedDate;
+        document.getElementById("confirm-time").textContent = timeValue;
+
+        // Show confirmation modal
+        confirmationModal.style.display = "flex";
+
+        // Reset form
+        bookingForm.reset();
+        serviceOptions.forEach((opt) => opt.classList.remove("selected"));
+        timeSlots.forEach((slot) => slot.classList.remove("selected"));
+        updateBookingSummary();
+      });
+
+      // Close Modal
+      document.getElementById("closeModal").addEventListener("click", () => {
+        confirmationModal.style.display = "none";
+      });
+
+      // Close modal when clicking outside
+      window.addEventListener("click", (e) => {
+        if (e.target === confirmationModal) {
+          confirmationModal.style.display = "none";
+        }
+      });
+
+      // Smooth Scrolling for Anchor Links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          const targetId = this.getAttribute("href");
+          if (targetId === "#") return;
+
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: "smooth",
+            });
+
+            // Close mobile menu if open
+            if (navLinks.classList.contains("active")) {
+              navLinks.classList.remove("active");
+              mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
