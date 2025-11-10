@@ -878,408 +878,386 @@
         <div class="cart-count" id="cartCount">0</div>
     </div>
 
-   <script type="module">
-        // Firestore Integration - UPDATED VERSION
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script type="module">
+    // Firestore Integration - CLEAN SINGLE VERSION
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
-            authDomain: "gegel-glit-glam.firebaseapp.com",
-            projectId: "gegel-glit-glam",
-            storageBucket: "gegel-glit-glam.firebasestorage.app",
-            messagingSenderId: "105374344569",
-            appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+        authDomain: "gegel-glit-glam.firebaseapp.com",
+        projectId: "gegel-glit-glam",
+        storageBucket: "gegel-glit-glam.firebasestorage.app",
+        messagingSenderId: "105374344569",
+        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const navLinks = document.querySelector('.nav-links');
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
 
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-        });
+    mobileMenuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+            ? '<i class="fas fa-times"></i>' 
+            : '<i class="fas fa-bars"></i>';
+    });
 
-        // Header Scroll Effect
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            if (window.scrollY > 100) {
-                header.classList.add('header-scrolled');
-            } else {
-                header.classList.remove('header-scrolled');
-            }
-        });
-
-        // Toggle Service Categories - UPDATED VERSION
-        function toggleCategory(categoryId) {
-            const category = document.getElementById(categoryId);
-            if (!category) return; // Safety check
-            
-            const categoryHeader = category.closest('.service-category')?.querySelector('.category-header');
-            if (!categoryHeader) return; // Safety check
-            
-            const icon = categoryHeader.querySelector('.category-icon i');
-            
-            category.classList.toggle('active');
-            
-            if (category.classList.contains('active')) {
-                icon.className = 'fas fa-chevron-up';
-            } else {
-                icon.className = 'fas fa-chevron-down';
-            }
+    // Header Scroll Effect
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('header');
+        if (window.scrollY > 100) {
+            header.classList.add('header-scrolled');
+        } else {
+            header.classList.remove('header-scrolled');
         }
+    });
 
-        // Toggle FAQ Items
-        function toggleFAQ(index) {
-            const answers = document.querySelectorAll('.faq-answer');
-            const questions = document.querySelectorAll('.faq-question i');
-            
-            if (index >= answers.length) return; // Safety check
-            
-            answers[index].classList.toggle('active');
-            
-            if (answers[index].classList.contains('active')) {
-                questions[index].className = 'fas fa-chevron-up';
-            } else {
-                questions[index].className = 'fas fa-chevron-down';
-            }
+    // Toggle Service Categories - SINGLE DECLARATION
+    const toggleCategory = function(categoryId) {
+        const category = document.getElementById(categoryId);
+        if (!category) {
+            console.error('Category not found:', categoryId);
+            return;
         }
-
-        // Shopping Cart Functionality with Local Storage
-        let cart = JSON.parse(localStorage.getItem('regelCart')) || [];
-        const cartItems = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const cartCount = document.getElementById('cartCount');
-        const cartEmpty = document.getElementById('cartEmpty');
-
-        // Initialize cart on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCart();
-            // Don't call toggleCategory here since categories will be loaded dynamically
-        });
-
-        // Add to Cart Function - UPDATED VERSION
-        function attachCartEventListeners() {
-            document.querySelectorAll('.add-to-cart').forEach(button => {
-                button.addEventListener('click', function() {
-                    const service = this.getAttribute('data-service');
-                    const price = parseInt(this.getAttribute('data-price'));
-                    const duration = this.getAttribute('data-duration');
-                    
-                    // Check if service already in cart
-                    const existingItem = cart.find(item => item.service === service);
-                    
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        cart.push({
-                            service: service,
-                            price: price,
-                            duration: duration,
-                            quantity: 1
-                        });
-                    }
-                    
-                    // Save to localStorage
-                    saveCartToStorage();
-                    updateCart();
-                    showCartNotification(service);
-                });
-            });
-        }
-
-        // Remove from Cart
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            saveCartToStorage();
-            updateCart();
-        }
-
-        // Save cart to localStorage
-        function saveCartToStorage() {
-            localStorage.setItem('regelCart', JSON.stringify(cart));
-        }
-
-        // Clear cart (for testing)
-        function clearCart() {
-            cart = [];
-            saveCartToStorage();
-            updateCart();
-        }
-
-        // Update Cart Display
-        function updateCart() {
-            // Clear cart items
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.appendChild(cartEmpty);
-                cartEmpty.style.display = 'block';
-            } else {
-                cartEmpty.style.display = 'none';
-                
-                // Add each item to cart
-                cart.forEach((item, index) => {
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <div class="item-details">
-                            <h4>${item.service}</h4>
-                            <div class="item-price">$${item.price}</div>
-                            <small>${item.duration}</small>
-                        </div>
-                        <button class="remove-item" onclick="removeFromCart(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
-                    cartItems.appendChild(cartItem);
-                });
-            }
-            
-            // Update total and count
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            cartTotal.textContent = `$${total}`;
-            cartCount.textContent = count;
-        }
-
-        // Show Cart Notification
-        function showCartNotification(service) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 100px;
-                right: 30px;
-                background: var(--emerald);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                z-index: 1001;
-                max-width: 300px;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.innerHTML = `
-                <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-                Added "${service}" to your booking
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        // Toggle Cart Visibility
-        function toggleCart() {
-            const cart = document.getElementById('bookingCart');
-            cart.classList.toggle('active');
-        }
-
-        // Add CSS for notification animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(400px); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(400px); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Smooth Scrolling for Anchor Links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    if (navLinks.classList.contains('active')) {
-                        navLinks.classList.remove('active');
-                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    }
-                }
-            });
-        });
-
         
+        const categoryHeader = category.closest('.service-category')?.querySelector('.category-header');
+        if (!categoryHeader) return;
+        
+        const icon = categoryHeader.querySelector('.category-icon i');
+        
+        category.classList.toggle('active');
+        
+        if (category.classList.contains('active')) {
+            icon.className = 'fas fa-chevron-up';
+            window.history.replaceState(null, null, `#${categoryId}`);
+        } else {
+            icon.className = 'fas fa-chevron-down';
+        }
+    };
 
-        async function loadServices() {
-            try {
-                // Fetch categories
-                const categoriesQuery = query(collection(db, 'service_categories'), orderBy('category_name'));
-                const categoriesSnapshot = await getDocs(categoriesQuery);
+    // Toggle FAQ Items
+    const toggleFAQ = function(index) {
+        const answers = document.querySelectorAll('.faq-answer');
+        const questions = document.querySelectorAll('.faq-question i');
+        
+        if (index >= answers.length) return;
+        
+        answers[index].classList.toggle('active');
+        
+        if (answers[index].classList.contains('active')) {
+            questions[index].className = 'fas fa-chevron-up';
+        } else {
+            questions[index].className = 'fas fa-chevron-down';
+        }
+    };
+
+    // Shopping Cart Functionality
+    let cart = JSON.parse(localStorage.getItem('regelCart')) || [];
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartCount = document.getElementById('cartCount');
+    const cartEmpty = document.getElementById('cartEmpty');
+
+    // Add to Cart Function
+    function attachCartEventListeners() {
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const service = this.getAttribute('data-service');
+                const price = parseInt(this.getAttribute('data-price'));
+                const duration = this.getAttribute('data-duration');
                 
-                // Fetch services
-                const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
-                const servicesSnapshot = await getDocs(servicesQuery);
+                const existingItem = cart.find(item => item.service === service);
                 
-                const servicesByCategory = {};
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        service: service,
+                        price: price,
+                        duration: duration,
+                        quantity: 1
+                    });
+                }
                 
-                // Group services by category
-                servicesSnapshot.forEach(doc => {
-                    const service = { id: doc.id, ...doc.data() };
-                    if (!servicesByCategory[service.category_id]) {
-                        servicesByCategory[service.category_id] = [];
-                    }
-                    servicesByCategory[service.category_id].push(service);
+                localStorage.setItem('regelCart', JSON.stringify(cart));
+                updateCart();
+                showCartNotification(service);
+            });
+        });
+    }
+
+    // Remove from Cart
+    const removeFromCart = function(index) {
+        cart.splice(index, 1);
+        localStorage.setItem('regelCart', JSON.stringify(cart));
+        updateCart();
+    };
+
+    // Update Cart Display
+    function updateCart() {
+        cartItems.innerHTML = '';
+        
+        if (cart.length === 0) {
+            cartItems.appendChild(cartEmpty);
+            cartEmpty.style.display = 'block';
+        } else {
+            cartEmpty.style.display = 'none';
+            
+            cart.forEach((item, index) => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="item-details">
+                        <h4>${item.service}</h4>
+                        <div class="item-price">$${item.price}</div>
+                        <small>${item.duration}</small>
+                    </div>
+                    <button class="remove-item" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    removeFromCart(index);
+                });
+            });
+        }
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        
+        cartTotal.textContent = `$${total}`;
+        cartCount.textContent = count;
+    }
+
+    // Show Cart Notification
+    function showCartNotification(service) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: var(--emerald);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+            Added "${service}" to your booking
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Toggle Cart Visibility
+    const toggleCart = function() {
+        const cartElement = document.getElementById('bookingCart');
+        cartElement.classList.toggle('active');
+    };
+
+    // Add CSS for notification animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Smooth Scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
                 });
                 
-                // Render categories and services
-                renderServices(categoriesSnapshot, servicesByCategory);
-            } catch (error) {
-                console.error('Error loading services:', error);
-                // Fallback: use static content
-                console.log('Using static service content as fallback');
-            }
-        }
-
-        function renderServices(categoriesSnapshot, servicesByCategory) {
-            const servicesContainer = document.getElementById('services-container');
-            
-            if (!servicesContainer) {
-                console.error('Services container not found');
-                return;
-            }
-            
-            categoriesSnapshot.forEach(categoryDoc => {
-                const category = { id: categoryDoc.id, ...categoryDoc.data() };
-                const categoryServices = servicesByCategory[category.id] || [];
-                
-                if (categoryServices.length > 0) {
-                    const categoryHTML = `
-                        <div class="service-category">
-                            <div class="category-header" onclick="toggleCategory('${category.id}')">
-                                <h3><i class="${category.icon}"></i> ${category.category_name}</h3>
-                                <div class="category-icon">
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
-                            </div>
-                            <div class="category-content" id="${category.id}">
-                                <div class="services-grid">
-                                    ${categoryServices.map(service => `
-                                        <div class="service-item">
-                                            <div class="service-name">
-                                                <span>${service.service_name}</span>
-                                                <span class="service-price">$${service.price}</span>
-                                            </div>
-                                            <div class="service-duration">${service.duration}</div>
-                                            <p class="service-description">${service.description}</p>
-                                            <button class="btn btn-small add-to-cart" 
-                                                data-service="${service.service_name}" 
-                                                data-price="${service.price}" 
-                                                data-duration="${service.duration}">
-                                                Add to Booking
-                                            </button>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    servicesContainer.innerHTML += categoryHTML;
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
                 }
-            });
-            
-            // Re-attach event listeners for new buttons
-            attachCartEventListeners();
-            
-            // Auto-expand the first category
-            if (categoriesSnapshot.docs.length > 0) {
-                const firstCategory = categoriesSnapshot.docs[0];
-                setTimeout(() => {
-                    toggleCategory(firstCategory.id);
-                }, 100);
-            }
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize cart
-            updateCart();
-            
-            // Load services from Firestore
-            if (typeof db !== 'undefined') {
-                loadServices();
             }
         });
+    });
 
-        // Make functions available globally for onclick handlers
-        // if (!window.toggleCategory) {
-        //     window.toggleCategory = toggleCategory;
-        //     window.toggleFAQ = toggleFAQ;
-        //     window.toggleCart = toggleCart;
-        //     window.removeFromCart = removeFromCart;
-        // }
+    async function loadServices() {
+        try {
+            console.log('Loading services from Firestore...');
+            
+            const categoriesQuery = query(collection(db, 'service_categories'), orderBy('category_name'));
+            const categoriesSnapshot = await getDocs(categoriesQuery);
+            
+            const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
+            const servicesSnapshot = await getDocs(servicesQuery);
+            
+            const servicesByCategory = {};
+            
+            servicesSnapshot.forEach(doc => {
+                const service = { id: doc.id, ...doc.data() };
+                if (!servicesByCategory[service.category_id]) {
+                    servicesByCategory[service.category_id] = [];
+                }
+                servicesByCategory[service.category_id].push(service);
+            });
+            
+            renderServices(categoriesSnapshot, servicesByCategory);
+            
+        } catch (error) {
+            console.error('Error loading services:', error);
+            const servicesContainer = document.getElementById('services-container');
+            if (servicesContainer) {
+                servicesContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #dc3545;"></i>
+                        <h3>Unable to Load Services</h3>
+                        <p>Please check your internet connection and try again.</p>
+                        <button class="btn" onclick="location.reload()">Retry Loading</button>
+                    </div>
+                `;
+            }
+        }
+    }
 
-       // Make functions available globally for onclick handlers
-    window.toggleCategory = toggleCategory;
-    window.toggleFAQ = toggleFAQ;
-    window.toggleCart = toggleCart;
-    window.removeFromCart = removeFromCart;
+    function renderServices(categoriesSnapshot, servicesByCategory) {
+        const servicesContainer = document.getElementById('services-container');
+        
+        if (!servicesContainer) return;
+        
+        servicesContainer.innerHTML = '';
+        
+        let hasServices = false;
+        
+        categoriesSnapshot.forEach(categoryDoc => {
+            const category = { id: categoryDoc.id, ...categoryDoc.data() };
+            const categoryServices = servicesByCategory[category.id] || [];
+            
+            if (categoryServices.length > 0) {
+                hasServices = true;
+                const categoryHTML = `
+                    <div class="service-category">
+                        <div class="category-header" data-category-id="${category.id}">
+                            <h3><i class="${category.icon || 'fas fa-spa'}"></i> ${category.category_name}</h3>
+                            <div class="category-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="category-content" id="${category.id}">
+                            <div class="services-grid">
+                                ${categoryServices.map(service => `
+                                    <div class="service-item">
+                                        <div class="service-name">
+                                            <span>${service.service_name}</span>
+                                            <span class="service-price">$${service.price || '0'}</span>
+                                        </div>
+                                        <div class="service-duration">${service.duration || 'N/A'}</div>
+                                        <p class="service-description">${service.description || 'No description available.'}</p>
+                                        <button class="btn btn-small add-to-cart" 
+                                            data-service="${service.service_name}" 
+                                            data-price="${service.price || 0}" 
+                                            data-duration="${service.duration || 'N/A'}">
+                                            Add to Booking
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                servicesContainer.innerHTML += categoryHTML;
+            }
+        });
+        
+        // Add event listeners to category headers
+        document.querySelectorAll('.category-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const categoryId = this.getAttribute('data-category-id');
+                toggleCategory(categoryId);
+            });
+        });
+        
+        if (!hasServices) {
+            servicesContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--gray);">
+                    <i class="fas fa-info-circle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <h3>No Services Available</h3>
+                    <p>Please check back later or contact us for more information.</p>
+                </div>
+            `;
+        }
+        
+        attachCartEventListeners();
+        
+        if (categoriesSnapshot.docs.length > 0) {
+            const firstCategory = categoriesSnapshot.docs[0];
+            setTimeout(() => {
+                toggleCategory(firstCategory.id);
+            }, 100);
+        }
+    }
 
-    // Add this to services.html script section
+    // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if URL has hash and scroll to section
+        updateCart();
+        loadServices();
+
         if (window.location.hash) {
             const targetId = window.location.hash.substring(1);
             const targetElement = document.getElementById(targetId);
             
             if (targetElement) {
-                // Small timeout to ensure page is fully loaded
                 setTimeout(() => {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
-                    
-                    // Expand the category if it's collapsed
                     if (targetElement.classList.contains('category-content')) {
                         toggleCategory(targetId);
                     }
-                }, 100);
+                }, 500);
             }
         }
     });
 
-        // Also update your toggleCategory function to update URL
-        // function toggleCategory(categoryId) {
-        // const category = document.getElementById(categoryId);
-        // const icon = category.previousElementSibling.querySelector('.category-icon i');
-        
-        // category.classList.toggle('active');
-        
-        // if (category.classList.contains('active')) {
-        //     icon.className = 'fas fa-chevron-up';
-        //     // Update URL without page refresh
-        //     window.history.replaceState(null, null, `/services#${categoryId}`);
-        // } else {
-        //     icon.className = 'fas fa-chevron-down';
-        // }
-        // }
-    </script>
+    // Make functions available globally - SAFE CHECK
+    if (typeof window.toggleCategory === 'undefined') {
+        window.toggleCategory = toggleCategory;
+        window.toggleFAQ = toggleFAQ;
+        window.toggleCart = toggleCart;
+        window.removeFromCart = removeFromCart;
+    }
+ </script>
 </body>
 </html>
