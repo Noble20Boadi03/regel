@@ -1,5 +1,5 @@
 // initialize-database.js
-import { db, collection, addDoc } from './firebase-config.js';
+import { db, collection, addDoc } from './public/firebase-config.js';
 
 async function initializeDatabase() {
   try {

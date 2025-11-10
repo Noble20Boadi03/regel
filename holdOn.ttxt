@@ -3,3 +3,16 @@ npm install -g firebase-tools
 firebase login
 firebase init hosting
 firebase deploy
+
+
+
+/* {
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+} */

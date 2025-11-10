@@ -1,87 +1,1123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regel Glit Glam | Premium Beauty Salon</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --emerald: #0a5c36;
+        --emerald-light: #0d7a48;
+        --gold: #d4af37;
+        --rose-gold: #b76e79;
+        --cream: #f8f5f0;
+        --dark: #1a1a1a;
+        --gray: #6c757d;
+        --light-gray: #e9ecef;
+      }
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.5.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.5.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.5.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+      body {
+        font-family: "Raleway", sans-serif;
+        line-height: 1.6;
+        color: var(--dark);
+        background-color: var(--cream);
+        overflow-x: hidden;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        font-family: "Playfair Display", serif;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background: var(--emerald);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .btn:hover {
+        background: var(--emerald-light);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-gold {
+        background: var(--gold);
+        color: var(--dark);
+      }
+
+      .btn-gold:hover {
+        background: #e6c158;
+      }
+
+      /* Header & Navigation */
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .header-scrolled {
+        background: rgba(255, 255, 255, 0.98);
+        padding: 10px 0;
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      .logo {
+        font-family: "Playfair Display", serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--emerald);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo i {
+        color: var(--gold);
+        margin-right: 8px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+      }
+
+      .nav-links li {
+        margin-left: 30px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 500;
+        font-size: 16px;
+        transition: color 0.3s ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--emerald);
+      }
+
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--emerald);
+      }
+
+      /* Hero Section */
+      .hero {
+        height: 100vh;
+        background: linear-gradient(
+            rgba(10, 92, 54, 0.7),
+            rgba(10, 92, 54, 0.5)
+          ),
+          url("https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80")
+            no-repeat center center/cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        padding: 0 20px;
+      }
+
+      .hero-content {
+        max-width: 800px;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Services Section */
+      .section {
+        padding: 100px 0;
+      }
+
+      .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .section-title h2 {
+        font-size: 2.5rem;
+        color: var(--emerald);
+        position: relative;
+        display: inline-block;
+        margin-bottom: 15px;
+      }
+
+      .section-title h2:after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: var(--gold);
+      }
+
+      .section-title p {
+        color: var(--gray);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+      }
+
+      .service-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .service-img {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .service-content {
+        padding: 25px;
+      }
+
+      .service-content h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: var(--emerald);
+      }
+
+      .service-content p {
+        color: var(--gray);
+        margin-bottom: 15px;
+      }
+
+      .service-price {
+        font-weight: 600;
+        color: var(--gold);
+        font-size: 1.1rem;
+      }
+
+      /* Booking Section */
+      .booking {
+        background: linear-gradient(135deg, var(--emerald) 0%, #083c24 100%);
+        color: white;
+        text-align: center;
+      }
+
+      .booking h2 {
+        color: white;
+      }
+
+      .booking p {
+        max-width: 700px;
+        margin: 0 auto 40px;
+        font-size: 1.1rem;
+      }
+
+      .booking-steps {
+        display: flex;
+        justify-content: space-between;
+        max-width: 900px;
+        margin: 0 auto 50px;
+      }
+
+      .step {
+        flex: 1;
+        padding: 0 15px;
+      }
+
+      .step-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 30px;
+        color: var(--gold);
+      }
+
+      .step h3 {
+        margin-bottom: 10px;
+        font-size: 1.3rem;
+      }
+
+      /* Gallery Section */
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      .gallery-item {
+        height: 250px;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+      }
+
+      .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .gallery-item:hover img {
+        transform: scale(1.1);
+      }
+
+      .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 92, 54, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+      }
+
+      /* Team Section */
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+      }
+
+      .team-member {
+        text-align: center;
+      }
+
+      .member-img {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        overflow: hidden;
+        border: 5px solid var(--light-gray);
+      }
+
+      .member-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .team-member h3 {
+        font-size: 1.4rem;
+        margin-bottom: 5px;
+        color: var(--emerald);
+      }
+
+      .team-member .role {
+        color: var(--gold);
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+
+      /* Contact Section */
+      .contact-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+      }
+
+      .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .contact-item {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .contact-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--emerald);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+
+      .contact-details h3 {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+      }
+
+      .map-container {
+        height: 300px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .contact-form {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--light-gray);
+        border-radius: 4px;
+        font-family: "Raleway", sans-serif;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--emerald);
+        outline: none;
+      }
+
+      textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--dark);
+        color: white;
+        padding: 70px 0 20px;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 40px;
+        margin-bottom: 50px;
+      }
+
+      .footer-column h3 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: var(--gold);
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 10px;
+      }
+
+      .footer-links a {
+        color: #bbb;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .footer-links a:hover {
+        color: var(--gold);
+      }
+
+      .social-links {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .social-links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        color: white;
+        text-decoration: none;
+        transition: background 0.3s ease;
+      }
+
+      .social-links a:hover {
+        background: var(--gold);
+        color: var(--dark);
+      }
+
+      .copyright {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #bbb;
+        font-size: 14px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 992px) {
+        .hero h1 {
+          font-size: 2.8rem;
+        }
+
+        .booking-steps {
+          flex-direction: column;
+          gap: 30px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navbar {
+          padding: 15px 0;
+        }
+
+        .nav-links {
+          position: fixed;
+          top: 70px;
+          left: -100%;
+          width: 100%;
+          height: calc(100vh - 70px);
+          background: white;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          padding-top: 50px;
+          transition: left 0.3s ease;
+        }
+
+        .nav-links.active {
+          left: 0;
+        }
+
+        .nav-links li {
+          margin: 0 0 30px 0;
+        }
+
+        .mobile-menu-btn {
+          display: block;
+        }
+
+        .hero h1 {
+          font-size: 2.2rem;
+        }
+
+        .section {
+          padding: 70px 0;
+        }
+
+        .section-title h2 {
+          font-size: 2rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .hero h1 {
+          font-size: 1.8rem;
+        }
+
+        .hero p {
+          font-size: 1rem;
+        }
+
+        .btn {
+          padding: 10px 20px;
+          font-size: 14px;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <!-- Header & Navigation -->
+    <header id="header">
+      <div class="container">
+        <nav class="navbar">
+          <a href="#" class="logo">
+            <i class="fas fa-spa"></i>
+            Regel Glit Glam
+          </a>
+          <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="/services">Services</a></li>
+            <li><a href="/booking">Book Now</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#team">Our Team</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+          <button class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+          </button>
+        </nav>
+      </div>
+    </header>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <h1>Experience Luxury Beauty Care</h1>
+        <p>
+          At Regel Glit Glam, we transform your beauty routine into an exquisite
+          experience. Our expert team is dedicated to bringing out your natural
+          radiance.
+        </p>
+        <a href="/booking" class="btn btn-gold">Book Now</a>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section-title">
+          <h2>Our Premium Services</h2>
+          <p>
+            Indulge in our carefully curated beauty treatments designed to
+            enhance your natural beauty and boost your confidence.
+          </p>
+        </div>
+        <div class="services-grid">
+          <div class="service-card">
+            <div
+              class="service-img"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');
+              "
+            ></div>
+            <div class="service-content">
+              <h3>Hair Styling & Coloring</h3>
+              <p>
+                Transform your look with our expert hair services including
+                cutting, styling, and premium coloring techniques.
+              </p>
+              <div class="service-price">From $75</div>
+            </div>
+          </div>
+          <div class="service-card">
+            <div
+              class="service-img"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1607778833979-49f3b6d1a893?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');
+              "
+            ></div>
+            <div class="service-content">
+              <h3>Manicure & Pedicure</h3>
+              <p>
+                Pamper your hands and feet with our luxurious nail treatments
+                using premium products.
+              </p>
+              <div class="service-price">From $45</div>
+            </div>
+          </div>
+          <div class="service-card">
+            <div
+              class="service-img"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+              "
+            ></div>
+            <div class="service-content">
+              <h3>Facial Treatments</h3>
+              <p>
+                Rejuvenate your skin with our customized facials designed to
+                address your specific skincare needs.
+              </p>
+              <div class="service-price">From $90</div>
+            </div>
+          </div>
+          <div class="service-card">
+            <div
+              class="service-img"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+              "
+            ></div>
+            <div class="service-content">
+              <h3>Makeup Artistry</h3>
+              <p>
+                From natural day looks to glamorous evening makeup, our artists
+                will enhance your features perfectly.
+              </p>
+              <div class="service-price">From $65</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section class="section booking" id="booking">
+      <div class="container">
+        <div class="section-title">
+          <h2>Book Your Appointment</h2>
+          <p>
+            Schedule your visit in just a few simple steps. Our online booking
+            system makes it easy to find the perfect time for your beauty
+            treatment.
+          </p>
+        </div>
+        <div class="booking-steps">
+          <div class="step">
+            <div class="step-icon">
+              <i class="far fa-calendar-check"></i>
+            </div>
+            <h3>Select Service</h3>
+            <p>Choose from our wide range of premium beauty services</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="far fa-clock"></i>
+            </div>
+            <h3>Pick Date & Time</h3>
+            <p>Select your preferred date and time from available slots</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="far fa-credit-card"></i>
+            </div>
+            <h3>Confirm & Pay</h3>
+            <p>Secure your appointment with our easy payment system</p>
+          </div>
+        </div>
+        <a href="/booking" class="btn btn-gold">Book Appointment Now</a>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="section" id="gallery">
+      <div class="container">
+        <div class="section-title">
+          <h2>Our Work</h2>
+          <p>
+            Browse through our portfolio of stunning transformations and
+            beautiful results.
+          </p>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2064&q=80"
+              alt="Hair Styling"
+            />
+            <div class="gallery-overlay">
+              <i class="fas fa-search-plus fa-2x"></i>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+              alt="Nail Art"
+            />
+            <div class="gallery-overlay">
+              <i class="fas fa-search-plus fa-2x"></i>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+              alt="Makeup"
+            />
+            <div class="gallery-overlay">
+              <i class="fas fa-search-plus fa-2x"></i>
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+              alt="Skincare"
+            />
+            <div class="gallery-overlay">
+              <i class="fas fa-search-plus fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="section" id="team">
+      <div class="container">
+        <div class="section-title">
+          <h2>Meet Our Experts</h2>
+          <p>
+            Our talented team of beauty professionals is dedicated to providing
+            you with exceptional service and results.
+          </p>
+        </div>
+        <div class="team-grid">
+          <div class="team-member">
+            <div class="member-img">
+              <img
+                src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80"
+                alt="Sarah Johnson"
+              />
+            </div>
+            <h3>Sarah Johnson</h3>
+            <div class="role">Lead Stylist & Color Specialist</div>
+            <p>
+              With over 10 years of experience, Sarah specializes in balayage
+              and precision haircuts.
+            </p>
+          </div>
+          <div class="team-member">
+            <div class="member-img">
+              <img
+                src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80"
+                alt="Mia Rodriguez"
+              />
+            </div>
+            <h3>Mia Rodriguez</h3>
+            <div class="role">Nail Artist & Skincare Expert</div>
+            <p>
+              Mia creates stunning nail art designs and provides personalized
+              skincare consultations.
+            </p>
+          </div>
+          <div class="team-member">
+            <div class="member-img">
+              <img
+                src="https://images.unsplash.com/photo-1558898479-33c0057a5d12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                alt="David Chen"
+              />
+            </div>
+            <h3>David Chen</h3>
+            <div class="role">Master Esthetician</div>
+            <p>
+              David specializes in advanced facial treatments and non-invasive
+              skin rejuvenation techniques.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section-title">
+          <h2>Visit Our Salon</h2>
+          <p>
+            We'd love to welcome you to our beautiful salon. Get in touch to
+            book your appointment or ask any questions.
+          </p>
+        </div>
+        <div class="contact-container">
+          <div class="contact-info">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="contact-details">
+                <h3>Our Location</h3>
+                <p>
+                  123 Beauty Avenue, Glamour District<br />New York, NY 10001
+                </p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="contact-details">
+                <h3>Phone Number</h3>
+                <p>(555) 123-4567</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="far fa-envelope"></i>
+              </div>
+              <div class="contact-details">
+                <h3>Email Address</h3>
+                <p>info@regelglitglam.com</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="far fa-clock"></i>
+              </div>
+              <div class="contact-details">
+                <h3>Opening Hours</h3>
+                <p>
+                  Monday - Friday: 9am - 8pm<br />Saturday: 9am - 6pm<br />Sunday:
+                  10am - 4pm
+                </p>
+              </div>
+            </div>
+            <div class="map-container">
+              <i
+                class="fas fa-map-marked-alt fa-3x"
+                style="color: var(--emerald)"
+              ></i>
+            </div>
+          </div>
+          <div class="contact-form">
+            <h3>Send Us a Message</h3>
+            <form id="contactForm">
+              <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="message">Your Message</label>
+                <textarea id="message" class="form-control" required></textarea>
+              </div>
+              <button type="submit" class="btn">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-column">
+            <h3>Regel Glit Glam</h3>
+            <p>
+              Your premier destination for luxury beauty treatments and
+              exceptional service in a sophisticated environment.
+            </p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-pinterest-p"></i></a>
+              <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+          </div>
+          <div class="footer-column">
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li><a href="/services">Services</a></li>
+              <li><a href="/booking">Book Appointment</a></li>
+              <li><a href="#gallery">Gallery</a></li>
+              <li><a href="#team">Our Team</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Services</h3>
+            <ul class="footer-links">
+              <li><a href="#">Hair Styling</a></li>
+              <li><a href="#">Hair Coloring</a></li>
+              <li><a href="#">Manicure & Pedicure</a></li>
+              <li><a href="#">Facial Treatments</a></li>
+              <li><a href="#">Makeup Artistry</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h3>Contact Info</h3>
+            <ul class="footer-links">
+              <li>
+                <i class="fas fa-map-marker-alt"></i> 123 Beauty Avenue, NY
+                10001
+              </li>
+              <li><i class="fas fa-phone"></i> (555) 123-4567</li>
+              <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
+            </ul>
+          </div>
+        </div>
+        <div class="copyright">
+          <p>&copy; 2023 Regel Glit Glam Beauty Salon. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      // Import Firebase functions
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+       const firebaseConfig = {
+        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+        authDomain: "gegel-glit-glam.firebaseapp.com",
+        projectId: "gegel-glit-glam",
+        storageBucket: "gegel-glit-glam.firebasestorage.app",
+        messagingSenderId: "105374344569",
+        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      
+      // Mobile Menu Toggle
+      const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
+      const navLinks = document.querySelector(".nav-links");
+
+      mobileMenuBtn.addEventListener("click", () => {
+        navLinks.classList.toggle("active");
+        mobileMenuBtn.innerHTML = navLinks.classList.contains("active")
+          ? '<i class="fas fa-times"></i>'
+          : '<i class="fas fa-bars"></i>';
+      });
+
+      // Header Scroll Effect
+      window.addEventListener("scroll", () => {
+        const header = document.getElementById("header");
+        if (window.scrollY > 100) {
+          header.classList.add("header-scrolled");
+        } else {
+          header.classList.remove("header-scrolled");
+        }
+      });
+
+      // Smooth Scrolling for Anchor Links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          const targetId = this.getAttribute("href");
+          if (targetId === "#") return;
+
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: "smooth",
+            });
+
+            // Close mobile menu if open
+            if (navLinks.classList.contains("active")) {
+              navLinks.classList.remove("active");
+              mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+          }
+        });
+      });
+
+      // Contact Form Submission
+      const contactForm = document.getElementById("contactForm");
+      contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        alert("Thank you for your message! We will get back to you soon.");
+        contactForm.reset();
+      });
+
+      // Update contact form submission in regel.html
+      contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          message: document.getElementById('message').value,
+          sent_at: new Date()
+        };
 
         try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+          await addDoc(collection(db, 'contact_messages'), formData);
+          alert("Thank you for your message! We will get back to you soon.");
+          contactForm.reset();
+        } catch (error) {
+          console.error('Error sending message:', error);
+          alert("There was an error sending your message. Please try again.");
         }
       });
     </script>

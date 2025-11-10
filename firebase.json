@@ -1,10 +1,29 @@
 {
   "hosting": {
     "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/services",
+        "destination": "/services.html"
+      },
+      {
+        "source": "/booking", 
+        "destination": "/booking.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
+  },
+   "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }
