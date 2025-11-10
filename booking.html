@@ -1213,6 +1213,68 @@
         displaySelectedServices();
         updateBookingSummary();
       });
+
+      // Add to booking.html script section
+      import { db, collection, addDoc } from './firebase-config.js';
+
+      // Enhanced form submission
+      bookingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (selectedServices.length === 0) {
+          alert("Please select at least one service from the services page");
+          return;
+        }
+
+        if (!selectedTimeInput.value) {
+          alert("Please select a time slot");
+          return;
+        }
+
+        try {
+          // Create booking in Firestore
+          const bookingData = {
+            customer_id: null, // Will be set after customer creation
+            service_ids: selectedServices.map(service => service.id),
+            booking_date: dateInput.value,
+            booking_time: selectedTimeInput.value,
+            special_requests: document.getElementById('specialRequests').value,
+            status: 'Pending',
+            total_price: selectedServices.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            created_at: new Date(),
+            customer_info: {
+              first_name: document.getElementById('firstName').value,
+              last_name: document.getElementById('lastName').value,
+              email: document.getElementById('email').value,
+              phone: document.getElementById('phone').value
+            }
+          };
+
+          // Save booking to Firestore
+          const docRef = await addDoc(collection(db, 'bookings'), bookingData);
+          
+          // Show confirmation with booking ID
+          document.getElementById('confirm-services').textContent = serviceNames;
+          document.getElementById('confirm-date').textContent = formattedDate;
+          document.getElementById('confirm-time').textContent = timeValue;
+          document.getElementById('confirm-total').textContent = `$${totalPrice}`;
+          document.getElementById('confirm-booking-id').textContent = docRef.id;
+
+          confirmationModal.style.display = "flex";
+
+          // Clear localStorage and reset form
+          localStorage.removeItem("regelCart");
+          selectedServices = [];
+          displaySelectedServices();
+          bookingForm.reset();
+          timeSlots.forEach((slot) => slot.classList.remove("selected"));
+          updateBookingSummary();
+
+        } catch (error) {
+          console.error('Error creating booking:', error);
+          alert('There was an error submitting your booking. Please try again.');
+        }
+      });
     </script>
   </body>
 </html>

@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Regel Glit Glam</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --emerald: #0a5c36;
+            --emerald-light: #0d7a48;
+            --gold: #d4af37;
+            --rose-gold: #b76e79;
+            --cream: #f8f5f0;
+            --dark: #1a1a1a;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--cream);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--emerald);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--emerald-light);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .btn-gold:hover {
+            background: #e6c158;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .header-scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 10px 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--emerald);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--gold);
+            margin-right: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--emerald);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--emerald);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(rgba(10, 92, 54, 0.8), rgba(10, 92, 54, 0.6)), url('https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80') no-repeat center center/cover;
+            height: 30vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-top: 80px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* Admin Section */
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--emerald);
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--gold);
+        }
+
+        /* Admin Dashboard */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(10, 92, 54, 0.1);
+            color: var(--emerald);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.8rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--emerald);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Tabs */
+        .tab-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: linear-gradient(135deg, var(--emerald) 0%, #083c24 100%);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 20px 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-family: 'Raleway', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: var(--emerald);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        tr:hover {
+            background: rgba(10, 92, 54, 0.02);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--emerald);
+            outline: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            animation: modalFade 0.3s ease;
+        }
+
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .modal-header h2 {
+            color: var(--emerald);
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 70px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 0;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                padding-top: 50px;
+                transition: left 0.3s ease;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links li {
+                margin: 0 0 30px 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 40px 0;
+            }
+
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .tab-btn {
+                padding: 15px 20px;
+                font-size: 14px;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="regel.html" class="logo">
+                    <i class="fas fa-spa"></i>
+                    Regel Glit Glam
+                </a>
+                <ul class="nav-links">
+                    <li><a href="regel.html#home">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="booking.html">Book Now</a></li>
+                    <li><a href="regel.html#gallery">Gallery</a></li>
+                    <li><a href="regel.html#team">Our Team</a></li>
+                    <li><a href="regel.html#contact">Contact</a></li>
+                    <li><a href="admin.html" style="color: var(--gold);">Admin</a></li>
+                </ul>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Admin Dashboard</h1>
+            <p>Manage bookings, services, and salon operations</p>
+        </div>
+    </section>
+
+    <!-- Admin Dashboard Section -->
+    <section class="section">
+        <div class="container">
+            <!-- Statistics Cards -->
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="far fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-number" id="total-bookings">0</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-number" id="pending-bookings">0</div>
+                    <div class="stat-label">Pending Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <div class="stat-number" id="total-services">0</div>
+                    <div class="stat-label">Active Services</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" id="total-customers">0</div>
+                    <div class="stat-label">Total Customers</div>
+                </div>
+            </div>
+
+            <!-- Tab Container -->
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('bookings')">
+                        <i class="far fa-calendar-alt"></i> Bookings
+                    </button>
+                    <button class="tab-btn" onclick="showTab('services')">
+                        <i class="fas fa-spa"></i> Services
+                    </button>
+                    <button class="tab-btn" onclick="showTab('customers')">
+                        <i class="fas fa-users"></i> Customers
+                    </button>
+                    <button class="tab-btn" onclick="showTab('messages')">
+                        <i class="far fa-envelope"></i> Messages
+                    </button>
+                </div>
+
+                <!-- Bookings Tab -->
+                <div id="bookings-tab" class="tab-content active">
+                    <div class="section-title">
+                        <h2>Manage Bookings</h2>
+                        <p>View and update booking statuses</p>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Date & Time</th>
+                                    <th>Services</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-body">
+                                <!-- Bookings will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Services Tab -->
+                <div id="services-tab" class="tab-content">
+                    <div class="section-title">
+                        <h2>Manage Services</h2>
+                        <p>Add, edit, or disable services</p>
+                    </div>
+                    
+                    <button class="btn btn-gold" onclick="showServiceModal()" style="margin-bottom: 20px;">
+                        <i class="fas fa-plus"></i> Add New Service
+                    </button>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Service Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="services-body">
+                                <!-- Services will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Customers Tab -->
+                <div id="customers-tab" class="tab-content">
+                    <div class="section-title">
+                        <h2>Customer Management</h2>
+                        <p>View customer information and booking history</p>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Total Bookings</th>
+                                    <th>Last Visit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-body">
+                                <!-- Customers will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Messages Tab -->
+                <div id="messages-tab" class="tab-content">
+                    <div class="section-title">
+                        <h2>Contact Messages</h2>
+                        <p>Manage customer inquiries and messages</p>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Message</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="messages-body">
+                                <!-- Messages will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Regel Glit Glam</h3>
+                    <p>Your premier destination for luxury beauty treatments and exceptional service in a sophisticated environment.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="regel.html#home">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="booking.html">Book Appointment</a></li>
+                        <li><a href="regel.html#gallery">Gallery</a></li>
+                        <li><a href="regel.html#team">Our Team</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="services.html#nail-care">Nail Care</a></li>
+                        <li><a href="services.html#hair-wigs">Hair & Wigs</a></li>
+                        <li><a href="services.html#makeup-beauty">Makeup & Beauty</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Beauty Avenue, NY 10001</li>
+                        <li><i class="fas fa-phone"></i> (555) 123-4567</li>
+                        <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Regel Glit Glam Beauty Salon. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Service Modal -->
+    <div class="modal" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="serviceModalTitle">Add New Service</h2>
+                <button class="close-modal" onclick="closeServiceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="serviceForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="serviceName">Service Name</label>
+                        <input type="text" id="serviceName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceCategory">Category</label>
+                        <select id="serviceCategory" class="form-control" required>
+                            <option value="">Select Category</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="servicePrice">Price ($)</label>
+                        <input type="number" id="servicePrice" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceDuration">Duration</label>
+                        <input type="text" id="serviceDuration" class="form-control" placeholder="e.g., 60 min" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDescription">Description</label>
+                    <textarea id="serviceDescription" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="serviceImage">Image URL</label>
+                    <input type="url" id="serviceImage" class="form-control" placeholder="https://...">
+                </div>
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Save Service</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, where } from './firebase-config.js';
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+
+        // Tab Management
+        window.showTab = function(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab and activate button
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
+        // Modal Management
+        window.showServiceModal = function(service = null) {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('serviceModalTitle');
+            const form = document.getElementById('serviceForm');
+            
+            if (service) {
+                title.textContent = 'Edit Service';
+                // Populate form with service data
+                document.getElementById('serviceName').value = service.service_name;
+                document.getElementById('servicePrice').value = service.price;
+                document.getElementById('serviceDuration').value = service.duration;
+                document.getElementById('serviceDescription').value = service.description;
+                document.getElementById('serviceImage').value = service.image_url || '';
+                // Store service ID for update
+                form.dataset.editId = service.id;
+            } else {
+                title.textContent = 'Add New Service';
+                form.reset();
+                delete form.dataset.editId;
+            }
+            
+            modal.style.display = 'flex';
+        };
+
+        window.closeServiceModal = function() {
+            document.getElementById('serviceModal').style.display = 'none';
+        };
+
+        // Load Statistics
+        async function loadStatistics() {
+            try {
+                // Total Bookings
+                const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
+                document.getElementById('total-bookings').textContent = bookingsSnapshot.size;
+                
+                // Pending Bookings
+                const pendingQuery = query(collection(db, 'bookings'), where('status', '==', 'Pending'));
+                const pendingSnapshot = await getDocs(pendingQuery);
+                document.getElementById('pending-bookings').textContent = pendingSnapshot.size;
+                
+                // Active Services
+                const servicesQuery = query(collection(db, 'services'), where('is_active', '==', true));
+                const servicesSnapshot = await getDocs(servicesQuery);
+                document.getElementById('total-services').textContent = servicesSnapshot.size;
+                
+                // Total Customers (approximate - count unique emails from bookings)
+                const customers = new Set();
+                bookingsSnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    if (booking.customer_info && booking.customer_info.email) {
+                        customers.add(booking.customer_info.email);
+                    }
+                });
+                document.getElementById('total-customers').textContent = customers.size;
+                
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load Bookings
+        async function loadBookings() {
+            try {
+                const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
+                const querySnapshot = await getDocs(bookingsQuery);
+                const tbody = document.getElementById('bookings-body');
+                tbody.innerHTML = '';
+                
+                querySnapshot.forEach((doc) => {
+                    const booking = doc.data();
+                    const row = `
+                        <tr>
+                            <td>${doc.id.substring(0, 8)}...</td>
+                            <td>
+                                <strong>${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}</strong><br>
+                                <small>${booking.customer_info?.email || 'No email'}</small>
+                            </td>
+                            <td>
+                                ${new Date(booking.booking_date).toLocaleDateString()}<br>
+                                <small>${booking.booking_time}</small>
+                            </td>
+                            <td>${booking.service_ids?.length || 0} services</td>
+                            <td>$${booking.total_price || 0}</td>
+                            <td>
+                                <span class="status-badge status-${booking.status?.toLowerCase() || 'pending'}">
+                                    ${booking.status || 'Pending'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-small" onclick="viewBooking('${doc.id}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px;">
+                                        <option value="Pending" ${booking.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="Confirmed" ${booking.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                        <option value="Completed" ${booking.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                        <option value="Cancelled" ${booking.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        // Update Booking Status
+        window.updateBookingStatus = async function(bookingId, newStatus) {
+            try {
+                await updateDoc(doc(db, 'bookings', bookingId), {
+                    status: newStatus
+                });
+                alert('Booking status updated successfully!');
+                loadBookings(); // Refresh the table
+                loadStatistics(); // Refresh statistics
+            } catch (error) {
+                console.error('Error updating booking status:', error);
+                alert('Error updating booking status');
+            }
+        };
+
+        // Initialize the admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            loadBookings();
+            // Note: Services, customers, and messages loading would be implemented similarly
+        });
+
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

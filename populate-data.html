@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Initial Data - Regel Glit Glam</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background-color: #f8f5f0;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: #0a5c36;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #d4af37;
+            padding-bottom: 15px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #0a5c36;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #0d7a48;
+            transform: translateY(-2px);
+        }
+        
+        .btn-gold {
+            background: #d4af37;
+            color: #1a1a1a;
+        }
+        
+        .btn-gold:hover {
+            background: #e6c158;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .data-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .collection-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #0a5c36;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .category-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #0a5c36;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-database"></i> Regel Glit Glam - Data Population Tool</h1>
+        
+        <div class="category-info">
+            <h3><i class="fas fa-check-circle"></i> Categories Already Created</h3>
+            <p>Your service categories are already set up in Firestore with the following IDs:</p>
+            <div class="data-preview">
+                Nail Care Services: ybpxIPaJD02LxmcGPid9<br>
+                Hair & Wigs Services: H2jwyGhC89WKJW6wnX5E<br>
+                Makeup & Beauty Services: GVwXk22annnXurPdmcfV
+            </div>
+        </div>
+        
+        <div class="status info" id="connectionStatus">
+            <strong>Info:</strong> Configure Firebase below and then populate your services and other data.
+        </div>
+        
+        <div class="section">
+            <h2>1. Firebase Configuration</h2>
+            <p>Make sure you've created your Firebase project and copied the configuration.</p>
+            <div class="data-preview" id="firebaseConfigDisplay">
+                // Your Firebase config will appear here after setup
+            </div>
+            <button class="btn" onclick="setupFirebase()">Initialize Firebase Connection</button>
+        </div>
+        
+        <div class="section">
+            <h2>2. Populate Services</h2>
+            <p>This will add all your beauty services to the database using your existing category IDs.</p>
+            <div class="data-preview" id="servicesPreview">
+                // Services data will be shown here
+            </div>
+            <button class="btn btn-success" onclick="populateServices()">Populate All Services</button>
+            <button class="btn btn-gold" onclick="viewServices()">View Existing Services</button>
+        </div>
+        
+        <div class="section">
+            <h2>3. Populate Staff Members</h2>
+            <p>Add your team members to the database.</p>
+            <button class="btn" onclick="populateStaff()">Populate Staff Members</button>
+            <button class="btn btn-gold" onclick="viewStaff()">View Existing Staff</button>
+        </div>
+        
+        <div class="section">
+            <h2>4. Populate Gallery</h2>
+            <p>Add sample gallery images to showcase your work.</p>
+            <button class="btn" onclick="populateGallery()">Populate Gallery</button>
+            <button class="btn btn-gold" onclick="viewGallery()">View Gallery</button>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-success" onclick="populateAll()">Populate All Data (Services + Staff + Gallery)</button>
+            <button class="btn btn-danger" onclick="clearAllData()">Clear All Data</button>
+        </div>
+        
+        <div class="collection-stats" id="statsContainer">
+            <!-- Stats will be populated here -->
+        </div>
+        
+        <div class="status" id="statusMessage"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            doc, 
+            deleteDoc,
+            query,
+            where 
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+        let db;
+
+        // Your actual category IDs
+        const categoryIds = {
+            "Nail Care Services": "ybpxIPaJD02LxmcGPid9",
+            "Hair & Wigs Services": "H2jwyGhC89WKJW6wnX5E", 
+            "Makeup & Beauty Services": "GVwXk22annnXurPdmcfV"
+        };
+
+        // Firebase configuration - UPDATE THIS WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+            authDomain: "gegel-glit-glam.firebaseapp.com",
+            projectId: "gegel-glit-glam",
+            storageBucket: "gegel-glit-glam.firebasestorage.app",
+            messagingSenderId: "105374344569",
+            appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+        };
+
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function setupFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                document.getElementById('firebaseConfigDisplay').textContent = JSON.stringify(firebaseConfig, null, 2);
+                showStatus('Firebase connected successfully!', 'success');
+                updateStats();
+            } catch (error) {
+                showStatus('Error connecting to Firebase: ' + error.message, 'error');
+            }
+        }
+
+        async function populateServices() {
+            if (!db) {
+                showStatus('Please initialize Firebase first', 'error');
+                return;
+            }
+
+            const services = [
+                // Nail Care Services
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Pedicure (Men)",
+                    description: "A comprehensive foot care treatment designed specifically for men, including nail trimming, callus removal, and relaxing massage.",
+                    price: 90,
+                    duration: "75 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Pedicure (Women)",
+                    description: "Luxurious foot treatment with nail shaping, cuticle care, exfoliation, and moisturizing massage for soft, beautiful feet.",
+                    price: 70,
+                    duration: "60 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Pedicure with Nails",
+                    description: "Complete pedicure experience with nail extensions or enhancements for longer, more elegant-looking toes.",
+                    price: 85,
+                    duration: "75 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Pedicure with Gel Polish",
+                    description: "Premium pedicure finished with long-lasting gel polish that stays chip-free and glossy for weeks.",
+                    price: 100,
+                    duration: "90 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Manicure",
+                    description: "Classic hand care treatment including nail shaping, cuticle care, hand massage, and regular polish application.",
+                    price: 50,
+                    duration: "45 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Nails Cleaning & Polishing",
+                    description: "Quick refresh for your nails with thorough cleaning, shaping, and a fresh coat of polish in your chosen color.",
+                    price: 20,
+                    duration: "20 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Nail Care Services"],
+                    service_name: "Acrylic Nails",
+                    description: "Professional acrylic nail application for durable, long-lasting extensions with your choice of shape and length.",
+                    price: 150,
+                    duration: "120 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                // Hair & Wigs Services
+                {
+                    category_id: categoryIds["Hair & Wigs Services"],
+                    service_name: "Frontal Installation",
+                    description: "Professional frontal lace installation for a seamless, natural-looking hairline with custom blending to match your skin tone.",
+                    price: 250,
+                    duration: "120 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Hair & Wigs Services"],
+                    service_name: "Wig Revamp",
+                    description: "Complete wig restoration including cleaning, styling, and customization to refresh your favorite wig.",
+                    price: 100,
+                    duration: "90 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Hair & Wigs Services"],
+                    service_name: "Custom Wigs",
+                    description: "Bespoke wig creation tailored to your specifications with premium quality hair and expert craftsmanship.",
+                    price: 1200,
+                    duration: "Custom",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                // Makeup & Beauty Services
+                {
+                    category_id: categoryIds["Makeup & Beauty Services"],
+                    service_name: "Professional Makeup",
+                    description: "Expert makeup application for any occasion using premium products tailored to your skin type and desired look.",
+                    price: 150,
+                    duration: "60 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Makeup & Beauty Services"],
+                    service_name: "Special Occasion Makeup",
+                    description: "Glamorous makeup for weddings, proms, photoshoots, and other special events with trial session available.",
+                    price: 200,
+                    duration: "90-120 min",
+                    is_active: true,
+                    created_at: new Date()
+                },
+                {
+                    category_id: categoryIds["Makeup & Beauty Services"],
+                    service_name: "Eyelash Extensions",
+                    description: "Luxurious lash extensions in various styles and lengths for dramatic, eye-opening results that last for weeks.",
+                    price: 50,
+                    duration: "90 min",
+                    is_active: true,
+                    created_at: new Date()
+                }
+            ];
+
+            try {
+                let addedCount = 0;
+                for (const service of services) {
+                    await addDoc(collection(db, 'services'), service);
+                    addedCount++;
+                }
+                showStatus(`Successfully added ${addedCount} services to the database!`, 'success');
+                updateStats();
+            } catch (error) {
+                showStatus('Error populating services: ' + error.message, 'error');
+            }
+        }
+
+        async function populateStaff() {
+            if (!db) {
+                showStatus('Please initialize Firebase first', 'error');
+                return;
+            }
+
+            const staffMembers = [
+                {
+                    full_name: "Sarah Johnson",
+                    role: "Lead Stylist & Color Specialist",
+                    bio: "With over 10 years of experience, Sarah specializes in balayage and precision haircuts.",
+                    image_url: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f",
+                    social_links: {
+                        instagram: "https://instagram.com/sarahjohnson",
+                        facebook: "https://facebook.com/sarahjohnson"
+                    },
+                    created_at: new Date()
+                },
+                {
+                    full_name: "Mia Rodriguez",
+                    role: "Nail Artist & Skincare Expert",
+                    bio: "Mia creates stunning nail art designs and provides personalized skincare consultations.",
+                    image_url: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5",
+                    social_links: {
+                        instagram: "https://instagram.com/miarodriguez",
+                        pinterest: "https://pinterest.com/miarodriguez"
+                    },
+                    created_at: new Date()
+                },
+                {
+                    full_name: "David Chen",
+                    role: "Master Esthetician",
+                    bio: "David specializes in advanced facial treatments and non-invasive skin rejuvenation techniques.",
+                    image_url: "https://images.unsplash.com/photo-1558898479-33c0057a5d12",
+                    social_links: {
+                        instagram: "https://instagram.com/davidchen",
+                        linkedin: "https://linkedin.com/in/davidchen"
+                    },
+                    created_at: new Date()
+                }
+            ];
+
+            try {
+                for (const staff of staffMembers) {
+                    await addDoc(collection(db, 'staff'), staff);
+                }
+                showStatus('Staff members populated successfully!', 'success');
+                updateStats();
+            } catch (error) {
+                showStatus('Error populating staff: ' + error.message, 'error');
+            }
+        }
+
+        async function populateGallery() {
+            if (!db) {
+                showStatus('Please initialize Firebase first', 'error');
+                return;
+            }
+
+            const galleryItems = [
+                {
+                    image_url: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1",
+                    caption: "Beautiful Hair Styling Transformation",
+                    created_at: new Date()
+                },
+                {
+                    image_url: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9",
+                    caption: "Elegant Nail Art Design",
+                    created_at: new Date()
+                },
+                {
+                    image_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
+                    caption: "Professional Makeup Application",
+                    created_at: new Date()
+                },
+                {
+                    image_url: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1",
+                    caption: "Luxury Skincare Treatment",
+                    created_at: new Date()
+                }
+            ];
+
+            try {
+                for (const item of galleryItems) {
+                    await addDoc(collection(db, 'gallery'), item);
+                }
+                showStatus('Gallery items populated successfully!', 'success');
+                updateStats();
+            } catch (error) {
+                showStatus('Error populating gallery: ' + error.message, 'error');
+            }
+        }
+
+        async function populateAll() {
+            await populateServices();
+            await populateStaff();
+            await populateGallery();
+            showStatus('All data populated successfully!', 'success');
+        }
+
+        async function updateStats() {
+            if (!db) return;
+
+            const collections = ['service_categories', 'services', 'staff', 'gallery', 'bookings', 'contact_messages'];
+            const statsContainer = document.getElementById('statsContainer');
+            let statsHTML = '';
+
+            for (const collectionName of collections) {
+                try {
+                    const snapshot = await getDocs(collection(db, collectionName));
+                    statsHTML += `
+                        <div class="stat-card">
+                            <h3>${collectionName.replace('_', ' ').toUpperCase()}</h3>
+                            <p><strong>Count:</strong> ${snapshot.size}</p>
+                            <p><strong>Status:</strong> ${snapshot.size > 0 ? '✅ Populated' : '❌ Empty'}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    statsHTML += `
+                        <div class="stat-card">
+                            <h3>${collectionName.replace('_', ' ').toUpperCase()}</h3>
+                            <p><strong>Count:</strong> 0</p>
+                            <p><strong>Status:</strong> ❌ Error</p>
+                        </div>
+                    `;
+                }
+            }
+
+            statsContainer.innerHTML = statsHTML;
+        }
+
+        // View functions to check existing data
+        async function viewServices() {
+            if (!db) {
+                showStatus('Please initialize Firebase first', 'error');
+                return;
+            }
+            const snapshot = await getDocs(collection(db, 'services'));
+            const services = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                service_name: doc.data().service_name,
+                price: doc.data().price,
+                duration: doc.data().duration
+            }));
+            
+            let servicesText = `Found ${services.length} services:\n\n`;
+            services.forEach(service => {
+                servicesText += `• ${service.service_name} - $${service.price} (${service.duration})\n`;
+            });
+            
+            document.getElementById('servicesPreview').textContent = JSON.stringify(services, null, 2);
+            showStatus(`Found ${services.length} services`, 'info');
+            alert(servicesText);
+        }
+
+        async function viewStaff() {
+            if (!db) {
+                showStatus('Please initialize Firebase first', 'error');
+                return;
+            }
+            const snapshot = await getDocs(collection(db, 'staff'));
+            const staff = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            alert(`Found ${staff.length} staff members:\n\n${staff.map(s => s.full_name + ' - ' + s.role).join('\n')}`);
+        }
+
+        async function viewGallery() {
+            if (!db) {
+                showStatus('Please initialize Firebase first', 'error');
+                return;
+            }
+            const snapshot = await getDocs(collection(db, 'gallery'));
+            const gallery = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            alert(`Found ${gallery.length} gallery items`);
+        }
+
+        async function clearAllData() {
+            if (!db || !confirm('⚠️ ARE YOU SURE YOU WANT TO DELETE ALL DATA?\n\nThis will delete ALL services, staff, gallery, bookings, and contact messages!\n\nThis action cannot be undone!')) {
+                return;
+            }
+
+            const collections = ['services', 'staff', 'gallery', 'bookings', 'contact_messages'];
+            
+            try {
+                let totalDeleted = 0;
+                for (const collectionName of collections) {
+                    const snapshot = await getDocs(collection(db, collectionName));
+                    const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+                    await Promise.all(deletePromises);
+                    totalDeleted += snapshot.size;
+                }
+                showStatus(`Successfully deleted ${totalDeleted} documents across all collections!`, 'success');
+                updateStats();
+            } catch (error) {
+                showStatus('Error clearing data: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            setupFirebase();
+        };
+
+        // Make functions available globally
+        window.setupFirebase = setupFirebase;
+        window.populateServices = populateServices;
+        window.populateStaff = populateStaff;
+        window.populateGallery = populateGallery;
+        window.populateAll = populateAll;
+        window.viewServices = viewServices;
+        window.viewStaff = viewStaff;
+        window.viewGallery = viewGallery;
+        window.clearAllData = clearAllData;
+    </script>
+</body>
+</html>
