@@ -641,6 +641,9 @@
             <li><a href="#team">Our Team</a></li>
             <li><a href="#contact">Contact</a></li>
             <li><a href="/admin" style="color: var(--gold);">Admin</a></li>
+             <li id="auth-nav-item">
+                    <a href="/login.html" class="btn btn-small" id="auth-btn">Sign In</a>
+                </li>
           </ul>
           <button class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
@@ -1065,6 +1068,29 @@
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+
+    
+    const auth = firebase.auth();
+
+    // Update auth button based on login status
+    auth.onAuthStateChanged((user) => {
+        const authBtn = document.getElementById('auth-btn');
+        const authNavItem = document.getElementById('auth-nav-item');
+        
+        if (user) {
+            authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            authBtn.href = '#';
+            authBtn.onclick = () => {
+                auth.signOut().then(() => {
+                    window.location.reload();
+                });
+            };
+        } else {
+            authBtn.innerHTML = 'Sign In';
+            authBtn.href = '/login.html';
+            authBtn.onclick = null;
+        }
+    });
 
       // Mobile Menu Toggle
       const mobileMenuBtn = document.querySelector(".mobile-menu-btn");

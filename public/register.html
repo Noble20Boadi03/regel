@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Your existing CSS styles remain exactly the same */
         :root {
             --emerald: #FFB6C1;
             --emerald-light: #FF91A4;
@@ -646,8 +647,8 @@
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="password-input">
-                                <input type="password" id="password" class="form-control" placeholder="Create a password" required oninput="checkPasswordStrength()">
-                                <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                <input type="password" id="password" class="form-control" placeholder="Create a password" required>
+                                <button type="button" class="toggle-password" id="togglePassword">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -663,7 +664,7 @@
                             <label for="confirmPassword">Confirm Password</label>
                             <div class="password-input">
                                 <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
-                                <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                                <button type="button" class="toggle-password" id="toggleConfirmPassword">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -692,11 +693,11 @@
                         </div>
 
                         <div class="social-auth">
-                            <a href="#" class="social-btn google">
+                            <a href="#" class="social-btn google" id="googleSignUp">
                                 <i class="fab fa-google"></i>
                                 Google
                             </a>
-                            <a href="#" class="social-btn facebook">
+                            <a href="#" class="social-btn facebook" id="facebookSignUp">
                                 <i class="fab fa-facebook-f"></i>
                                 Facebook
                             </a>
@@ -761,8 +762,23 @@
     <script type="module">
         // Firebase Authentication
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            updateProfile, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            FacebookAuthProvider 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc,
+            collection,
+            query,
+            where,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
@@ -802,9 +818,8 @@
         });
 
         // Toggle Password Visibility
-        function togglePassword(inputId) {
+        function togglePassword(inputId, toggleIcon) {
             const passwordInput = document.getElementById(inputId);
-            const toggleIcon = passwordInput.nextElementSibling.querySelector('i');
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
@@ -822,7 +837,6 @@
             const strengthText = document.getElementById('strength-text');
             
             let strength = 0;
-            let feedback = '';
 
             // Length check
             if (password.length >= 8) strength += 1;
@@ -856,18 +870,53 @@
             }
         }
 
+        // Event Listeners for Password Toggle
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const toggleIcon = document.getElementById('togglePassword').querySelector('i');
+            togglePassword('password', toggleIcon);
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', () => {
+            const toggleIcon = document.getElementById('toggleConfirmPassword').querySelector('i');
+            togglePassword('confirmPassword', toggleIcon);
+        });
+
+        // Event Listener for Password Strength
+        document.getElementById('password').addEventListener('input', checkPasswordStrength);
+
+        // Check if email already exists
+        async function checkEmailExists(email) {
+            try {
+                const usersQuery = query(
+                    collection(db, 'users'), 
+                    where('email', '==', email.toLowerCase())
+                );
+                const querySnapshot = await getDocs(usersQuery);
+                return !querySnapshot.empty;
+            } catch (error) {
+                console.error('Error checking email:', error);
+                return false;
+            }
+        }
+
         // Register Form Submission
         const registerForm = document.getElementById('registerForm');
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const newsletter = document.getElementById('newsletter').checked;
+
+            // Validate required fields
+            if (!firstName || !lastName || !email || !password) {
+                showNotification('Please fill in all required fields.', 'error');
+                return;
+            }
 
             // Validate passwords match
             if (password !== confirmPassword) {
@@ -881,25 +930,38 @@
                 return;
             }
 
+            // Check if email already exists
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
+                showNotification('This email is already registered. Please sign in instead.', 'error');
+                return;
+            }
+
             try {
+                // Create user with email and password
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // Update user profile
+                // Update user profile with display name
                 await updateProfile(user, {
                     displayName: `${firstName} ${lastName}`
                 });
 
                 // Save additional user data to Firestore
-                await setDoc(doc(db, 'users', user.uid), {
+                const userData = {
+                    uid: user.uid,
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
                     phone: phone || '',
                     newsletter: newsletter,
                     createdAt: new Date(),
-                    role: 'customer'
-                });
+                    role: 'customer',
+                    emailVerified: false,
+                    lastLogin: new Date()
+                };
+
+                await setDoc(doc(db, 'users', user.uid), userData);
 
                 // Show success message
                 showNotification('Account created successfully! Welcome to Regel Glit Glam.', 'success');
@@ -918,13 +980,16 @@
                         errorMessage = 'This email is already registered. Please sign in instead.';
                         break;
                     case 'auth/invalid-email':
-                        errorMessage = 'Invalid email address.';
+                        errorMessage = 'Invalid email address format.';
                         break;
                     case 'auth/weak-password':
                         errorMessage = 'Password is too weak. Please choose a stronger password.';
                         break;
                     case 'auth/operation-not-allowed':
                         errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection.';
                         break;
                 }
                 
@@ -933,22 +998,37 @@
         });
 
         // Google Sign Up
-        document.querySelector('.social-btn.google').addEventListener('click', async (e) => {
+        document.getElementById('googleSignUp').addEventListener('click', async (e) => {
             e.preventDefault();
             
             try {
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
 
-                // Save user data to Firestore
-                await setDoc(doc(db, 'users', user.uid), {
-                    firstName: user.displayName?.split(' ')[0] || '',
-                    lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-                    email: user.email,
-                    createdAt: new Date(),
-                    role: 'customer',
-                    provider: 'google'
-                }, { merge: true });
+                // Check if user already exists in Firestore
+                const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
+                
+                if (userDoc.empty) {
+                    // Save new user data to Firestore
+                    const userData = {
+                        uid: user.uid,
+                        firstName: user.displayName?.split(' ')[0] || '',
+                        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+                        email: user.email,
+                        createdAt: new Date(),
+                        role: 'customer',
+                        provider: 'google',
+                        emailVerified: user.emailVerified,
+                        lastLogin: new Date()
+                    };
+
+                    await setDoc(doc(db, 'users', user.uid), userData);
+                } else {
+                    // Update last login for existing user
+                    await setDoc(doc(db, 'users', user.uid), {
+                        lastLogin: new Date()
+                    }, { merge: true });
+                }
 
                 showNotification('Google registration successful!', 'success');
                 setTimeout(() => {
@@ -957,27 +1037,50 @@
                 
             } catch (error) {
                 console.error('Google sign-up error:', error);
-                showNotification('Google registration failed. Please try again.', 'error');
+                let errorMessage = 'Google registration failed. Please try again.';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Google sign-up was cancelled.';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup was blocked. Please allow popups for this site.';
+                }
+                
+                showNotification(errorMessage, 'error');
             }
         });
 
         // Facebook Sign Up
-        document.querySelector('.social-btn.facebook').addEventListener('click', async (e) => {
+        document.getElementById('facebookSignUp').addEventListener('click', async (e) => {
             e.preventDefault();
             
             try {
                 const result = await signInWithPopup(auth, facebookProvider);
                 const user = result.user;
 
-                // Save user data to Firestore
-                await setDoc(doc(db, 'users', user.uid), {
-                    firstName: user.displayName?.split(' ')[0] || '',
-                    lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-                    email: user.email,
-                    createdAt: new Date(),
-                    role: 'customer',
-                    provider: 'facebook'
-                }, { merge: true });
+                // Check if user already exists in Firestore
+                const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
+                
+                if (userDoc.empty) {
+                    // Save new user data to Firestore
+                    const userData = {
+                        uid: user.uid,
+                        firstName: user.displayName?.split(' ')[0] || '',
+                        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+                        email: user.email,
+                        createdAt: new Date(),
+                        role: 'customer',
+                        provider: 'facebook',
+                        emailVerified: user.emailVerified,
+                        lastLogin: new Date()
+                    };
+
+                    await setDoc(doc(db, 'users', user.uid), userData);
+                } else {
+                    // Update last login for existing user
+                    await setDoc(doc(db, 'users', user.uid), {
+                        lastLogin: new Date()
+                    }, { merge: true });
+                }
 
                 showNotification('Facebook registration successful!', 'success');
                 setTimeout(() => {
@@ -986,13 +1089,28 @@
                 
             } catch (error) {
                 console.error('Facebook sign-up error:', error);
-                showNotification('Facebook registration failed. Please try again.', 'error');
+                let errorMessage = 'Facebook registration failed. Please try again.';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Facebook sign-up was cancelled.';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup was blocked. Please allow popups for this site.';
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                    errorMessage = 'An account already exists with the same email but different sign-in method.';
+                }
+                
+                showNotification(errorMessage, 'error');
             }
         });
 
         // Show Notification
         function showNotification(message, type) {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.custom-notification');
+            existingNotifications.forEach(notification => notification.remove());
+
             const notification = document.createElement('div');
+            notification.className = 'custom-notification';
             notification.style.cssText = `
                 position: fixed;
                 top: 100px;

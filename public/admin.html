@@ -629,6 +629,9 @@
                     <li><a href="/#gallery">Gallery</a></li>
                     <li><a href="/#contact">Contact</a></li>
                     <li><a href="/admin.html" style="color: var(--gold);">Admin</a></li>
+                    <li id="auth-nav-item">
+                    <a href="/login.html" class="btn btn-small" id="auth-btn">Sign In</a>
+                </li>
                 </ul>
                 <button class="mobile-menu-btn">
                     <i class="fas fa-bars"></i>
@@ -876,7 +879,7 @@
         </div>
     </div>
 
-    <script type="module">
+    <!-- <script type="module">
     // Import Firebase functions
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { 
@@ -904,6 +907,804 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    // // Mobile Menu Toggle
+    // const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    // const navLinks = document.querySelector('.nav-links');
+
+    // mobileMenuBtn.addEventListener('click', () => {
+    //     navLinks.classList.toggle('active');
+    //     mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+    //         ? '<i class="fas fa-times"></i>' 
+    //         : '<i class="fas fa-bars"></i>';
+    // });
+
+    // // Header Scroll Effect
+    // window.addEventListener('scroll', () => {
+    //     const header = document.getElementById('header');
+    //     if (window.scrollY > 100) {
+    //         header.classList.add('header-scrolled');
+    //     } else {
+    //         header.classList.remove('header-scrolled');
+    //     }
+    // });
+
+    // // Tab Management
+    // window.showTab = function(tabName) {
+    //     // Hide all tabs
+    //     document.querySelectorAll('.tab-content').forEach(tab => {
+    //         tab.classList.remove('active');
+    //     });
+        
+    //     // Remove active class from all buttons
+    //     document.querySelectorAll('.tab-btn').forEach(btn => {
+    //         btn.classList.remove('active');
+    //     });
+        
+    //     // Show selected tab and activate button
+    //     document.getElementById(`${tabName}-tab`).classList.add('active');
+    //     event.currentTarget.classList.add('active');
+    // };
+
+    // // Modal Management
+    // window.showServiceModal = function(service = null) {
+    //     const modal = document.getElementById('serviceModal');
+    //     const title = document.getElementById('serviceModalTitle');
+    //     const form = document.getElementById('serviceForm');
+        
+    //     if (service) {
+    //         title.textContent = 'Edit Service';
+    //         // Populate form with service data
+    //         document.getElementById('serviceName').value = service.service_name;
+    //         document.getElementById('serviceCategory').value = service.category;
+    //         document.getElementById('servicePrice').value = service.price;
+    //         document.getElementById('serviceDuration').value = service.duration;
+    //         document.getElementById('serviceDescription').value = service.description;
+    //         document.getElementById('serviceImage').value = service.image_url || '';
+    //         // Store service ID for update
+    //         form.dataset.editId = service.id;
+    //     } else {
+    //         title.textContent = 'Add New Service';
+    //         form.reset();
+    //         delete form.dataset.editId;
+    //     }
+        
+    //     modal.style.display = 'flex';
+    // };
+
+    // window.closeServiceModal = function() {
+    //     document.getElementById('serviceModal').style.display = 'none';
+    // };
+
+    // // Load Statistics
+    // async function loadStatistics() {
+    //     try {
+    //         // Total Bookings
+    //         const bookingsQuery = query(collection(db, 'bookings'));
+    //         const bookingsSnapshot = await getDocs(bookingsQuery);
+    //         document.getElementById('total-bookings').textContent = bookingsSnapshot.size;
+            
+    //         // Pending Bookings
+    //         const pendingQuery = query(collection(db, 'bookings'), where('status', '==', 'Pending'));
+    //         const pendingSnapshot = await getDocs(pendingQuery);
+    //         document.getElementById('pending-bookings').textContent = pendingSnapshot.size;
+            
+    //         // Active Services
+    //         const servicesQuery = query(collection(db, 'services'), where('is_active', '==', true));
+    //         const servicesSnapshot = await getDocs(servicesQuery);
+    //         document.getElementById('total-services').textContent = servicesSnapshot.size;
+            
+    //         // Total Customers (count unique emails from bookings)
+    //         const customers = new Set();
+    //         bookingsSnapshot.forEach(doc => {
+    //             const booking = doc.data();
+    //             if (booking.customer_info && booking.customer_info.email) {
+    //                 customers.add(booking.customer_info.email);
+    //             }
+    //         });
+    //         document.getElementById('total-customers').textContent = customers.size;
+            
+    //     } catch (error) {
+    //         console.error('Error loading statistics:', error);
+    //     }
+    // }
+
+    // // Load Bookings
+    // async function loadBookings() {
+    //     try {
+    //         const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
+    //         const querySnapshot = await getDocs(bookingsQuery);
+    //         const tbody = document.getElementById('bookings-body');
+    //         tbody.innerHTML = '';
+            
+    //         querySnapshot.forEach((doc) => {
+    //             const booking = doc.data();
+    //             const row = `
+    //                 <tr>
+    //                     <td>${doc.id.substring(0, 8)}...</td>
+    //                     <td>
+    //                         <strong>${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}</strong><br>
+    //                         <small>${booking.customer_info?.email || 'No email'}</small>
+    //                     </td>
+    //                     <td>
+    //                         ${booking.booking_date ? new Date(booking.booking_date).toLocaleDateString() : 'N/A'}<br>
+    //                         <small>${booking.booking_time || 'N/A'}</small>
+    //                     </td>
+    //                     <td>${booking.service_ids?.length || 0} services</td>
+    //                     <td>GHS ${booking.total_price || 0}</td>
+    //                     <td>
+    //                         <span class="status-badge status-${booking.status?.toLowerCase() || 'pending'}">
+    //                             ${booking.status || 'Pending'}
+    //                         </span>
+    //                     </td>
+    //                     <td>
+    //                         <div class="action-buttons">
+    //                             <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px;">
+    //                                 <option value="Pending" ${booking.status === 'Pending' ? 'selected' : ''}>Pending</option>
+    //                                 <option value="Confirmed" ${booking.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+    //                                 <option value="Completed" ${booking.status === 'Completed' ? 'selected' : ''}>Completed</option>
+    //                                 <option value="Cancelled" ${booking.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+    //                             </select>
+    //                         </div>
+    //                     </td>
+    //                 </tr>
+    //             `;
+    //             tbody.innerHTML += row;
+    //         });
+            
+    //     } catch (error) {
+    //         console.error('Error loading bookings:', error);
+    //     }
+    // }
+
+    // // Load Services
+    // async function loadServices() {
+    //     try {
+    //         const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
+    //         const querySnapshot = await getDocs(servicesQuery);
+    //         const tbody = document.getElementById('services-body');
+    //         tbody.innerHTML = '';
+            
+    //         querySnapshot.forEach((doc) => {
+    //             const service = doc.data();
+    //             const row = `
+    //                 <tr>
+    //                     <td>${service.service_name}</td>
+    //                     <td>${service.category || 'General'}</td>
+    //                     <td>GHS ${service.price}</td>
+    //                     <td>${service.duration}</td>
+    //                     <td>
+    //                         <span class="status-badge ${service.is_active ? 'status-completed' : 'status-cancelled'}">
+    //                             ${service.is_active ? 'Active' : 'Inactive'}
+    //                         </span>
+    //                     </td>
+    //                     <td>
+    //                         <div class="action-buttons">
+    //                             <button class="btn btn-small" onclick="showServiceModal(${JSON.stringify({id: doc.id, ...service}).replace(/"/g, '&quot;')})">
+    //                                 <i class="fas fa-edit"></i>
+    //                             </button>
+    //                             <button class="btn btn-small btn-danger" onclick="toggleServiceStatus('${doc.id}', ${!service.is_active})">
+    //                                 <i class="fas ${service.is_active ? 'fa-times' : 'fa-check'}"></i>
+    //                             </button>
+    //                         </div>
+    //                     </td>
+    //                 </tr>
+    //             `;
+    //             tbody.innerHTML += row;
+    //         });
+            
+    //     } catch (error) {
+    //         console.error('Error loading services:', error);
+    //     }
+    // }
+
+    // // Load Customers
+    // async function loadCustomers() {
+    //     try {
+    //         const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
+    //         const customers = {};
+            
+    //         bookingsSnapshot.forEach(doc => {
+    //             const booking = doc.data();
+    //             if (booking.customer_info && booking.customer_info.email) {
+    //                 const email = booking.customer_info.email;
+    //                 if (!customers[email]) {
+    //                     customers[email] = {
+    //                         name: `${booking.customer_info.first_name || ''} ${booking.customer_info.last_name || ''}`.trim(),
+    //                         email: email,
+    //                         phone: booking.customer_info.phone || 'N/A',
+    //                         totalBookings: 0,
+    //                         lastVisit: null
+    //                     };
+    //                 }
+    //                 customers[email].totalBookings++;
+                    
+    //                 const bookingDate = booking.booking_date ? new Date(booking.booking_date) : new Date();
+    //                 if (!customers[email].lastVisit || bookingDate > customers[email].lastVisit) {
+    //                     customers[email].lastVisit = bookingDate;
+    //                 }
+    //             }
+    //         });
+            
+    //         const tbody = document.getElementById('customers-body');
+    //         tbody.innerHTML = '';
+            
+    //         Object.values(customers).forEach(customer => {
+    //             const row = `
+    //                 <tr>
+    //                     <td>${customer.name || 'Unknown'}</td>
+    //                     <td>${customer.email}</td>
+    //                     <td>${customer.phone}</td>
+    //                     <td>${customer.totalBookings}</td>
+    //                     <td>${customer.lastVisit ? customer.lastVisit.toLocaleDateString() : 'N/A'}</td>
+    //                     <td>
+    //                         <button class="btn btn-small" onclick="viewCustomerHistory('${customer.email}')">
+    //                             <i class="fas fa-history"></i> History
+    //                         </button>
+    //                     </td>
+    //                 </tr>
+    //             `;
+    //             tbody.innerHTML += row;
+    //         });
+            
+    //     } catch (error) {
+    //         console.error('Error loading customers:', error);
+    //     }
+    // }
+
+    // // Update Booking Status
+    // window.updateBookingStatus = async function(bookingId, newStatus) {
+    //     try {
+    //         const bookingRef = doc(db, 'bookings', bookingId);
+    //         await updateDoc(bookingRef, {
+    //             status: newStatus
+    //         });
+    //         alert('Booking status updated successfully!');
+    //         loadBookings();
+    //         loadStatistics();
+    //     } catch (error) {
+    //         console.error('Error updating booking status:', error);
+    //         alert('Error updating booking status');
+    //     }
+    // };
+
+    // // Toggle Service Status
+    // window.toggleServiceStatus = async function(serviceId, newStatus) {
+    //     try {
+    //         const serviceRef = doc(db, 'services', serviceId);
+    //         await updateDoc(serviceRef, {
+    //             is_active: newStatus
+    //         });
+    //         alert('Service status updated successfully!');
+    //         loadServices();
+    //         loadStatistics();
+    //     } catch (error) {
+    //         console.error('Error updating service status:', error);
+    //         alert('Error updating service status');
+    //     }
+    // };
+
+    // // Service Form Handler
+    // document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+    //     e.preventDefault();
+        
+    //     const serviceData = {
+    //         service_name: document.getElementById('serviceName').value,
+    //         category: document.getElementById('serviceCategory').value,
+    //         price: parseFloat(document.getElementById('servicePrice').value),
+    //         duration: document.getElementById('serviceDuration').value,
+    //         description: document.getElementById('serviceDescription').value,
+    //         image_url: document.getElementById('serviceImage').value || '',
+    //         is_active: true
+    //     };
+        
+    //     try {
+    //         if (this.dataset.editId) {
+    //             // Update existing service
+    //             const serviceRef = doc(db, 'services', this.dataset.editId);
+    //             await updateDoc(serviceRef, serviceData);
+    //         } else {
+    //             // Add new service
+    //             await addDoc(collection(db, 'services'), serviceData);
+    //         }
+            
+    //         closeServiceModal();
+    //         loadServices();
+    //         loadStatistics();
+    //         alert('Service saved successfully!');
+            
+    //     } catch (error) {
+    //         console.error('Error saving service:', error);
+    //         alert('Error saving service');
+    //     }
+    // });
+
+    // // Initialize the admin dashboard
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     loadStatistics();
+    //     loadBookings();
+    //     loadServices();
+    //     loadCustomers();
+        
+    //     // Real-time listener for bookings
+    //     const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
+    //     onSnapshot(bookingsQuery, () => {
+    //         loadStatistics();
+    //         loadBookings();
+    //         loadCustomers();
+    //     });
+    // });
+
+    // // Smooth Scrolling for Anchor Links
+    // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    //     anchor.addEventListener('click', function (e) {
+    //         e.preventDefault();
+            
+    //         const targetId = this.getAttribute('href');
+    //         if (targetId === '#') return;
+            
+    //         const targetElement = document.querySelector(targetId);
+    //         if (targetElement) {
+    //             window.scrollTo({
+    //                 top: targetElement.offsetTop - 80,
+    //                 behavior: 'smooth'
+    //             });
+                
+    //             // Close mobile menu if open
+    //             if (navLinks.classList.contains('active')) {
+    //                 navLinks.classList.remove('active');
+    //                 mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    //             }
+    //         }
+    //     });
+    // });
+
+
+      // Authentication and Role Checking
+        auth.onAuthStateChanged(async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const adminContent = document.getElementById('adminContent');
+            const accessDenied = document.getElementById('accessDenied');
+            const authNavItem = document.getElementById('auth-nav-item');
+            const authBtn = document.getElementById('auth-btn');
+
+            if (user) {
+                // User is signed in, check if they are admin
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists && userDoc.data().role === 'admin') {
+                        // User is admin, show admin content
+                        loadingScreen.style.display = 'none';
+                        adminContent.style.display = 'block';
+                        
+                        // Update auth button to show logout
+                        authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                        authBtn.href = '#';
+                        authBtn.onclick = () => {
+                            auth.signOut().then(() => {
+                                window.location.href = '/';
+                            });
+                        };
+                        
+                        // Initialize admin dashboard
+                        initializeAdminDashboard();
+                    } else {
+                        // User is not admin, show access denied
+                        loadingScreen.style.display = 'none';
+                        accessDenied.style.display = 'block';
+                        
+                        // Update auth button
+                        updateAuthButton(user, authBtn, authNavItem);
+                    }
+                } catch (error) {
+                    console.error('Error checking user role:', error);
+                    loadingScreen.style.display = 'none';
+                    accessDenied.style.display = 'block';
+                }
+            } else {
+                // No user signed in, redirect to login
+                window.location.href = '/login.html?redirect=admin';
+            }
+        });
+
+        function updateAuthButton(user, authBtn, authNavItem) {
+            if (user) {
+                authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                authBtn.href = '#';
+                authBtn.onclick = () => {
+                    auth.signOut().then(() => {
+                        window.location.href = '/';
+                    });
+                };
+            } else {
+                authBtn.innerHTML = 'Sign In';
+                authBtn.href = '/login.html';
+                authBtn.onclick = null;
+            }
+        }
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+
+        // Tab Management
+        window.showTab = function(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab and activate button
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
+        // Modal Management
+        window.showServiceModal = function(service = null) {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('serviceModalTitle');
+            const form = document.getElementById('serviceForm');
+            
+            if (service) {
+                title.textContent = 'Edit Service';
+                // Populate form with service data
+                document.getElementById('serviceName').value = service.service_name;
+                document.getElementById('serviceCategory').value = service.category;
+                document.getElementById('servicePrice').value = service.price;
+                document.getElementById('serviceDuration').value = service.duration;
+                document.getElementById('serviceDescription').value = service.description;
+                document.getElementById('serviceImage').value = service.image_url || '';
+                // Store service ID for update
+                form.dataset.editId = service.id;
+            } else {
+                title.textContent = 'Add New Service';
+                form.reset();
+                delete form.dataset.editId;
+            }
+            
+            modal.style.display = 'flex';
+        };
+
+        window.closeServiceModal = function() {
+            document.getElementById('serviceModal').style.display = 'none';
+        };
+
+        // Initialize Admin Dashboard Functions
+        function initializeAdminDashboard() {
+            // Load Statistics
+            loadStatistics();
+            loadBookings();
+            loadServices();
+            loadCustomers();
+            
+            // Real-time listener for bookings
+            const bookingsQuery = db.collection('bookings').orderBy('created_at', 'desc');
+            bookingsQuery.onSnapshot(() => {
+                loadStatistics();
+                loadBookings();
+                loadCustomers();
+            });
+
+            // Service Form Handler
+            document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const serviceData = {
+                    service_name: document.getElementById('serviceName').value,
+                    category: document.getElementById('serviceCategory').value,
+                    price: parseFloat(document.getElementById('servicePrice').value),
+                    duration: document.getElementById('serviceDuration').value,
+                    description: document.getElementById('serviceDescription').value,
+                    image_url: document.getElementById('serviceImage').value || '',
+                    is_active: true
+                };
+                
+                try {
+                    if (this.dataset.editId) {
+                        // Update existing service
+                        const serviceRef = db.collection('services').doc(this.dataset.editId);
+                        await serviceRef.update(serviceData);
+                    } else {
+                        // Add new service
+                        await db.collection('services').add(serviceData);
+                    }
+                    
+                    closeServiceModal();
+                    loadServices();
+                    loadStatistics();
+                    alert('Service saved successfully!');
+                    
+                } catch (error) {
+                    console.error('Error saving service:', error);
+                    alert('Error saving service');
+                }
+            });
+        }
+
+        // Load Statistics
+        async function loadStatistics() {
+            try {
+                // Total Bookings
+                const bookingsSnapshot = await db.collection('bookings').get();
+                document.getElementById('total-bookings').textContent = bookingsSnapshot.size;
+                
+                // Pending Bookings
+                const pendingSnapshot = await db.collection('bookings').where('status', '==', 'Pending').get();
+                document.getElementById('pending-bookings').textContent = pendingSnapshot.size;
+                
+                // Active Services
+                const servicesSnapshot = await db.collection('services').where('is_active', '==', true).get();
+                document.getElementById('total-services').textContent = servicesSnapshot.size;
+                
+                // Total Customers (count unique emails from bookings)
+                const customers = new Set();
+                bookingsSnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    if (booking.customer_info && booking.customer_info.email) {
+                        customers.add(booking.customer_info.email);
+                    }
+                });
+                document.getElementById('total-customers').textContent = customers.size;
+                
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load Bookings
+        async function loadBookings() {
+            try {
+                const querySnapshot = await db.collection('bookings').orderBy('created_at', 'desc').get();
+                const tbody = document.getElementById('bookings-body');
+                tbody.innerHTML = '';
+                
+                querySnapshot.forEach((doc) => {
+                    const booking = doc.data();
+                    const row = `
+                        <tr>
+                            <td>${doc.id.substring(0, 8)}...</td>
+                            <td>
+                                <strong>${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}</strong><br>
+                                <small>${booking.customer_info?.email || 'No email'}</small>
+                            </td>
+                            <td>
+                                ${booking.booking_date ? new Date(booking.booking_date).toLocaleDateString() : 'N/A'}<br>
+                                <small>${booking.booking_time || 'N/A'}</small>
+                            </td>
+                            <td>${booking.services?.length || 0} services</td>
+                            <td>GHS ${booking.total_price || 0}</td>
+                            <td>
+                                <span class="status-badge status-${booking.status?.toLowerCase() || 'pending'}">
+                                    ${booking.status || 'Pending'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px;">
+                                        <option value="Pending" ${booking.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="Confirmed" ${booking.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                        <option value="Completed" ${booking.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                        <option value="Cancelled" ${booking.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        // Load Services
+        async function loadServices() {
+            try {
+                const querySnapshot = await db.collection('services').orderBy('service_name').get();
+                const tbody = document.getElementById('services-body');
+                tbody.innerHTML = '';
+                
+                querySnapshot.forEach((doc) => {
+                    const service = doc.data();
+                    const row = `
+                        <tr>
+                            <td>${service.service_name}</td>
+                            <td>${service.category || 'General'}</td>
+                            <td>GHS ${service.price}</td>
+                            <td>${service.duration}</td>
+                            <td>
+                                <span class="status-badge ${service.is_active ? 'status-completed' : 'status-cancelled'}">
+                                    ${service.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-small" onclick="showServiceModal(${JSON.stringify({id: doc.id, ...service}).replace(/"/g, '&quot;')})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-small btn-danger" onclick="toggleServiceStatus('${doc.id}', ${!service.is_active})">
+                                        <i class="fas ${service.is_active ? 'fa-times' : 'fa-check'}"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        // Load Customers
+        async function loadCustomers() {
+            try {
+                const bookingsSnapshot = await db.collection('bookings').get();
+                const customers = {};
+                
+                bookingsSnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    if (booking.customer_info && booking.customer_info.email) {
+                        const email = booking.customer_info.email;
+                        if (!customers[email]) {
+                            customers[email] = {
+                                name: `${booking.customer_info.first_name || ''} ${booking.customer_info.last_name || ''}`.trim(),
+                                email: email,
+                                phone: booking.customer_info.phone || 'N/A',
+                                totalBookings: 0,
+                                lastVisit: null
+                            };
+                        }
+                        customers[email].totalBookings++;
+                        
+                        const bookingDate = booking.booking_date ? new Date(booking.booking_date) : new Date();
+                        if (!customers[email].lastVisit || bookingDate > customers[email].lastVisit) {
+                            customers[email].lastVisit = bookingDate;
+                        }
+                    }
+                });
+                
+                const tbody = document.getElementById('customers-body');
+                tbody.innerHTML = '';
+                
+                Object.values(customers).forEach(customer => {
+                    const row = `
+                        <tr>
+                            <td>${customer.name || 'Unknown'}</td>
+                            <td>${customer.email}</td>
+                            <td>${customer.phone}</td>
+                            <td>${customer.totalBookings}</td>
+                            <td>${customer.lastVisit ? customer.lastVisit.toLocaleDateString() : 'N/A'}</td>
+                            <td>
+                                <button class="btn btn-small" onclick="viewCustomerHistory('${customer.email}')">
+                                    <i class="fas fa-history"></i> History
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+            } catch (error) {
+                console.error('Error loading customers:', error);
+            }
+        }
+
+        // Update Booking Status
+        window.updateBookingStatus = async function(bookingId, newStatus) {
+            try {
+                const bookingRef = db.collection('bookings').doc(bookingId);
+                await bookingRef.update({
+                    status: newStatus
+                });
+                alert('Booking status updated successfully!');
+                loadBookings();
+                loadStatistics();
+            } catch (error) {
+                console.error('Error updating booking status:', error);
+                alert('Error updating booking status');
+            }
+        };
+
+        // Toggle Service Status
+        window.toggleServiceStatus = async function(serviceId, newStatus) {
+            try {
+                const serviceRef = db.collection('services').doc(serviceId);
+                await serviceRef.update({
+                    is_active: newStatus
+                });
+                alert('Service status updated successfully!');
+                loadServices();
+                loadStatistics();
+            } catch (error) {
+                console.error('Error updating service status:', error);
+                alert('Error updating service status');
+            }
+        };
+
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+</script> -->
+
+    <script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getFirestore, 
+        collection, 
+        getDocs, 
+        addDoc, 
+        updateDoc, 
+        doc, 
+        query, 
+        orderBy, 
+        where,
+        onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { 
+        getAuth, 
+        onAuthStateChanged, 
+        signOut 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+        authDomain: "gegel-glit-glam.firebaseapp.com",
+        projectId: "gegel-glit-glam",
+        storageBucket: "gegel-glit-glam.firebasestorage.app",
+        messagingSenderId: "105374344569",
+        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
     // Mobile Menu Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
@@ -1027,7 +1828,7 @@
                             ${booking.booking_date ? new Date(booking.booking_date).toLocaleDateString() : 'N/A'}<br>
                             <small>${booking.booking_time || 'N/A'}</small>
                         </td>
-                        <td>${booking.service_ids?.length || 0} services</td>
+                        <td>${booking.services?.length || 0} services</td>
                         <td>GHS ${booking.total_price || 0}</td>
                         <td>
                             <span class="status-badge status-${booking.status?.toLowerCase() || 'pending'}">
@@ -1216,8 +2017,65 @@
         }
     });
 
-    // Initialize the admin dashboard
-    document.addEventListener('DOMContentLoaded', function() {
+    // Authentication and Role Checking
+    onAuthStateChanged(auth, async (user) => {
+        const authBtn = document.getElementById('auth-btn');
+        const authNavItem = document.getElementById('auth-nav-item');
+
+        if (user) {
+            // User is signed in, check if they are admin
+            try {
+                const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
+                const userSnapshot = await getDocs(userQuery);
+                
+                if (!userSnapshot.empty) {
+                    const userDoc = userSnapshot.docs[0];
+                    const userData = userDoc.data();
+                    
+                    if (userData.role === 'admin') {
+                        // User is admin, initialize admin dashboard
+                        updateAuthButton(user, authBtn, authNavItem);
+                        initializeAdminDashboard();
+                    } else {
+                        // User is not admin, redirect to home
+                        alert('Access denied. Admin privileges required.');
+                        window.location.href = '/';
+                    }
+                } else {
+                    // No user document found
+                    alert('User not found in database.');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error checking user role:', error);
+                alert('Error verifying user permissions.');
+                window.location.href = '/';
+            }
+        } else {
+            // No user signed in, redirect to login
+            window.location.href = '/login.html?redirect=admin';
+        }
+    });
+
+    function updateAuthButton(user, authBtn, authNavItem) {
+        if (user) {
+            authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            authBtn.href = '#';
+            authBtn.onclick = () => {
+                signOut(auth).then(() => {
+                    window.location.href = '/';
+                });
+            };
+        } else {
+            authBtn.innerHTML = 'Sign In';
+            authBtn.href = '/login.html';
+            authBtn.onclick = null;
+        }
+    }
+
+    // Initialize Admin Dashboard Functions
+    function initializeAdminDashboard() {
+        // Load Statistics
         loadStatistics();
         loadBookings();
         loadServices();
@@ -1230,7 +2088,7 @@
             loadBookings();
             loadCustomers();
         });
-    });
+    }
 
     // Smooth Scrolling for Anchor Links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
