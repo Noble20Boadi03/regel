@@ -9,6 +9,10 @@
         "destination": "/index.html"
       },
       {
+        "source": "/admin",
+        "destination": "/admin.html"
+      },
+      {
         "source": "/services",
         "destination": "/services.html"
       },

@@ -12,6 +12,8 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Add CSP header to allow Firebase to work properly -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com/ajax/libs/font-awesome/ https://fonts.googleapis.com https://firestore.googleapis.com;">
     <style>
       :root {
         --emerald: #FFB6C1;
@@ -682,6 +684,7 @@
             <li><a href="/#gallery">Gallery</a></li>
             <li><a href="/#team">Our Team</a></li>
             <li><a href="/#contact">Contact</a></li>
+            <li><a href="/admin" style="color: var(--gold);">Admin</a></li>
           </ul>
           <button class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
@@ -936,6 +939,7 @@
           Thank you for booking with Regel Glit Glam. We've sent a confirmation
           email with your appointment details.
         </p>
+        <p><strong>Booking ID:</strong> <span id="confirm-booking-id"></span></p>
         <p><strong>Date:</strong> <span id="confirm-date"></span></p>
         <p><strong>Time:</strong> <span id="confirm-time"></span></p>
         <p><strong>Services:</strong> <span id="confirm-services"></span></p>
@@ -948,7 +952,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-       const firebaseConfig = {
+      const firebaseConfig = {
         apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
         authDomain: "gegel-glit-glam.firebaseapp.com",
         projectId: "gegel-glit-glam",
@@ -1100,8 +1104,8 @@
           const serviceNames = selectedServices.map(s => s.service).join(', ');
           document.getElementById("summary-services").textContent = serviceNames;
           
-          const totalPrice = selectedServices.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-          document.getElementById("summary-total").textContent = `$${totalPrice}`;
+          const totalPrice = selectedServices.reduce((sum, item) => sum + parseFloat(item.price), 0);
+          document.getElementById("summary-total").textContent = `$${totalPrice.toFixed(2)}`;
           
           const totalDuration = calculateTotalDuration();
           document.getElementById("summary-duration").textContent = totalDuration;
@@ -1137,7 +1141,8 @@
       const bookingForm = document.getElementById("bookingForm");
       const confirmationModal = document.getElementById("confirmationModal");
 
-      bookingForm.addEventListener("submit", (e) => {
+      // Single form submission handler
+      bookingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         // Validate form
@@ -1151,39 +1156,80 @@
           return;
         }
 
-        // Get form values for confirmation
-        const dateValue = dateInput.value;
-        const formattedDate = new Date(dateValue).toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-        const timeValue = document.querySelector(
-          ".time-slot.selected"
-        ).textContent;
+        try {
+          // Get form values
+          const firstName = document.getElementById('firstName').value;
+          const lastName = document.getElementById('lastName').value;
+          const email = document.getElementById('email').value;
+          const phone = document.getElementById('phone').value;
+          const dateValue = dateInput.value;
+          const timeValue = selectedTimeInput.value;
+          const specialRequests = document.getElementById('specialRequests').value;
 
-        const serviceNames = selectedServices.map(s => s.service).join(', ');
-        const totalPrice = selectedServices.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          // Format date for display
+          const formattedDate = new Date(dateValue).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
 
-        // Set confirmation details
-        document.getElementById("confirm-services").textContent = serviceNames;
-        document.getElementById("confirm-date").textContent = formattedDate;
-        document.getElementById("confirm-time").textContent = timeValue;
-        document.getElementById("confirm-total").textContent = `$${totalPrice}`;
+          // Format time for display
+          const timeElement = document.querySelector(".time-slot.selected");
+          const displayTime = timeElement ? timeElement.textContent : timeValue;
 
-        // Show confirmation modal
-        confirmationModal.style.display = "flex";
+          // Calculate total price
+          const totalPrice = selectedServices.reduce((sum, item) => sum + parseFloat(item.price), 0);
+          const serviceNames = selectedServices.map(s => s.service).join(', ');
 
-        // Clear localStorage after successful booking
-        localStorage.removeItem("regelCart");
-        selectedServices = [];
-        displaySelectedServices();
+          // Create booking data for Firestore
+          const bookingData = {
+            customer_info: {
+              first_name: firstName,
+              last_name: lastName,
+              email: email,
+              phone: phone
+            },
+            services: selectedServices.map(service => ({
+              id: service.id || service.service.toLowerCase().replace(/\s+/g, '-'),
+              name: service.service,
+              price: parseFloat(service.price),
+              duration: service.duration
+            })),
+            booking_date: dateValue,
+            booking_time: timeValue,
+            special_requests: specialRequests,
+            status: 'Pending',
+            total_price: totalPrice,
+            created_at: new Date(),
+            updated_at: new Date()
+          };
 
-        // Reset form
-        bookingForm.reset();
-        timeSlots.forEach((slot) => slot.classList.remove("selected"));
-        updateBookingSummary();
+          // Save booking to Firestore
+          const docRef = await addDoc(collection(db, 'bookings'), bookingData);
+          
+          // Update confirmation modal with booking details
+          document.getElementById('confirm-booking-id').textContent = docRef.id;
+          document.getElementById('confirm-services').textContent = serviceNames;
+          document.getElementById('confirm-date').textContent = formattedDate;
+          document.getElementById('confirm-time').textContent = displayTime;
+          document.getElementById('confirm-total').textContent = `$${totalPrice.toFixed(2)}`;
+
+          // Show confirmation modal
+          confirmationModal.style.display = "flex";
+
+          // Clear localStorage and reset form
+          localStorage.removeItem("regelCart");
+          selectedServices = [];
+          displaySelectedServices();
+          bookingForm.reset();
+          timeSlots.forEach((slot) => slot.classList.remove("selected"));
+          updateBookingSummary();
+
+        } catch (error) {
+          console.error('Error creating booking:', error);
+          alert('There was an error submitting your booking. Please try again.');
+        }
       });
 
       // Close Modal
@@ -1226,66 +1272,6 @@
       document.addEventListener("DOMContentLoaded", function() {
         displaySelectedServices();
         updateBookingSummary();
-      });
-
-      
-      // Enhanced form submission
-      bookingForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        if (selectedServices.length === 0) {
-          alert("Please select at least one service from the services page");
-          return;
-        }
-
-        if (!selectedTimeInput.value) {
-          alert("Please select a time slot");
-          return;
-        }
-
-        try {
-          // Create booking in Firestore
-          const bookingData = {
-            customer_id: null, // Will be set after customer creation
-            service_ids: selectedServices.map(service => service.id),
-            booking_date: dateInput.value,
-            booking_time: selectedTimeInput.value,
-            special_requests: document.getElementById('specialRequests').value,
-            status: 'Pending',
-            total_price: selectedServices.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-            created_at: new Date(),
-            customer_info: {
-              first_name: document.getElementById('firstName').value,
-              last_name: document.getElementById('lastName').value,
-              email: document.getElementById('email').value,
-              phone: document.getElementById('phone').value
-            }
-          };
-
-          // Save booking to Firestore
-          const docRef = await addDoc(collection(db, 'bookings'), bookingData);
-          
-          // Show confirmation with booking ID
-          document.getElementById('confirm-services').textContent = serviceNames;
-          document.getElementById('confirm-date').textContent = formattedDate;
-          document.getElementById('confirm-time').textContent = timeValue;
-          document.getElementById('confirm-total').textContent = `$${totalPrice}`;
-          document.getElementById('confirm-booking-id').textContent = docRef.id;
-
-          confirmationModal.style.display = "flex";
-
-          // Clear localStorage and reset form
-          localStorage.removeItem("regelCart");
-          selectedServices = [];
-          displaySelectedServices();
-          bookingForm.reset();
-          timeSlots.forEach((slot) => slot.classList.remove("selected"));
-          updateBookingSummary();
-
-        } catch (error) {
-          console.error('Error creating booking:', error);
-          alert('There was an error submitting your booking. Please try again.');
-        }
       });
     </script>
   </body>

@@ -14,14 +14,14 @@
     />
     <style>
       :root {
-        --emerald: #FFB6C1;
-        --emerald-light: #FF91A4;
+        --emerald: #ffb6c1;
+        --emerald-light: #ff91a4;
         --gold: #d4af37;
         --rose-gold: #b76e79;
-        --cream: #FFF5F8;
+        --cream: #fff5f8;
         --dark: #1a1a1a;
         --gray: #6c757d;
-        --light-gray: #FFE5EC;
+        --light-gray: #ffe5ec;
       }
 
       * {
@@ -272,7 +272,7 @@
 
       /* Booking Section */
       .booking {
-        background: linear-gradient(135deg, var(--emerald) 0%, #FF91A4 100%);
+        background: linear-gradient(135deg, var(--emerald) 0%, #ff91a4 100%);
         color: white;
         text-align: center;
       }
@@ -640,6 +640,7 @@
             <li><a href="#gallery">Gallery</a></li>
             <li><a href="#team">Our Team</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><a href="/admin" style="color: var(--gold);">Admin</a></li>
           </ul>
           <button class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
@@ -654,8 +655,8 @@
         <h1>Experience Luxury Beauty Care</h1>
         <p>
           At Regel Glit Glam, we transform your beauty routine into an exquisite
-          experience. Our expert team specializes in wig installations, nail care, 
-          and professional makeup services in Accra, Ghana.
+          experience. Our expert team specializes in wig installations, nail
+          care, and professional makeup services in Accra, Ghana.
         </p>
         <a href="/booking" class="btn btn-gold">Book Now</a>
       </div>
@@ -673,7 +674,8 @@
         </div>
         <div class="services-grid">
           <div class="service-card">
-            <div class="service-img"
+            <div
+              class="service-img"
               style="
                 background-image: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80');
               "
@@ -713,8 +715,9 @@
             <div class="service-content">
               <h3>Makeup & Beauty</h3>
               <p>
-                Professional makeup application for any occasion. From natural day looks 
-                to glamorous evening makeup, our artists will enhance your features perfectly.
+                Professional makeup application for any occasion. From natural
+                day looks to glamorous evening makeup, our artists will enhance
+                your features perfectly.
               </p>
               <div class="service-price">From 150 cedis</div>
             </div>
@@ -729,7 +732,7 @@
             <div class="service-content">
               <h3>Nail Care Services</h3>
               <p>
-                Complete nail care including cleaning, polishing, acrylic nails, 
+                Complete nail care including cleaning, polishing, acrylic nails,
                 and gel polish applications for long-lasting beautiful nails.
               </p>
               <div class="service-price">From 20 cedis</div>
@@ -849,7 +852,7 @@
             <h3>Abena Mensah</h3>
             <div class="role">Lead Stylist & Wig Specialist</div>
             <p>
-              With years of experience, Abena specializes in wig installations, 
+              With years of experience, Abena specializes in wig installations,
               frontals, and creating stunning hair transformations.
             </p>
           </div>
@@ -863,7 +866,7 @@
             <h3>Joyce Osei</h3>
             <div class="role">Nail Artist & Beauty Specialist</div>
             <p>
-              Joyce creates stunning nail art designs and provides professional 
+              Joyce creates stunning nail art designs and provides professional
               manicure and pedicure services for both men and women.
             </p>
           </div>
@@ -877,8 +880,8 @@
             <h3>Nikki</h3>
             <div class="role">Makeup Artist & Beauty Expert</div>
             <p>
-              Nikki specializes in professional makeup application for all occasions, 
-              from natural day looks to glamorous evening makeup.
+              Nikki specializes in professional makeup application for all
+              occasions, from natural day looks to glamorous evening makeup.
             </p>
           </div>
           <div class="team-member">
@@ -891,8 +894,8 @@
             <h3>Yaa</h3>
             <div class="role">Beauty Specialist & Stylist</div>
             <p>
-              Yaa brings expertise in multiple beauty services, ensuring every client 
-              receives personalized care and exceptional results.
+              Yaa brings expertise in multiple beauty services, ensuring every
+              client receives personalized care and exceptional results.
             </p>
           </div>
         </div>
@@ -917,9 +920,7 @@
               </div>
               <div class="contact-details">
                 <h3>Our Location</h3>
-                <p>
-                  Accra, Ghana<br />Visit us at our salon location
-                </p>
+                <p>Accra, Ghana<br />Visit us at our salon location</p>
               </div>
             </div>
             <div class="contact-item">
@@ -1025,9 +1026,7 @@
           <div class="footer-column">
             <h3>Contact Info</h3>
             <ul class="footer-links">
-              <li>
-                <i class="fas fa-map-marker-alt"></i> Accra, Ghana
-              </li>
+              <li><i class="fas fa-map-marker-alt"></i> Accra, Ghana</li>
               <li><i class="fas fa-phone"></i> 0556548737</li>
               <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
             </ul>
@@ -1042,22 +1041,25 @@
     <script type="module">
       // Import Firebase functions
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-       const firebaseConfig = {
+      const firebaseConfig = {
         apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
         authDomain: "gegel-glit-glam.firebaseapp.com",
         projectId: "gegel-glit-glam",
         storageBucket: "gegel-glit-glam.firebasestorage.app",
         messagingSenderId: "105374344569",
-        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8",
       };
 
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      
       // Mobile Menu Toggle
       const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
       const navLinks = document.querySelector(".nav-links");
@@ -1112,23 +1114,23 @@
       });
 
       // Update contact form submission in regel.html
-      contactForm.addEventListener('submit', async (e) => {
+      contactForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
+
         const formData = {
-          name: document.getElementById('name').value,
-          email: document.getElementById('email').value,
-          phone: document.getElementById('phone').value,
-          message: document.getElementById('message').value,
-          sent_at: new Date()
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          message: document.getElementById("message").value,
+          sent_at: new Date(),
         };
 
         try {
-          await addDoc(collection(db, 'contact_messages'), formData);
+          await addDoc(collection(db, "contact_messages"), formData);
           alert("Thank you for your message! We will get back to you soon.");
           contactForm.reset();
         } catch (error) {
-          console.error('Error sending message:', error);
+          console.error("Error sending message:", error);
           alert("There was an error sending your message. Please try again.");
         }
       });
