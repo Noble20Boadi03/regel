@@ -270,6 +270,32 @@
         font-size: 1.1rem;
       }
 
+      .for-more-container {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.for-more-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff8fa2, #ffb6b9);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.for-more-btn:hover {
+  background: linear-gradient(135deg, #ffb6b9, #ff8fa2);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+
       /* Booking Section */
       .booking {
         background: linear-gradient(135deg, var(--emerald) 0%, #ff91a4 100%);
@@ -635,15 +661,19 @@
           </a>
           <ul class="nav-links">
             <li><a href="#home">Home</a></li>
-            <li><a href="/services">Services</a></li>
-            <li><a href="/booking">Book Now</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#booking">Book Now</a></li>
             <li><a href="#gallery">Gallery</a></li>
             <li><a href="#team">Our Team</a></li>
             <li><a href="#contact">Contact</a></li>
+<<<<<<< HEAD
             <li><a href="/admin" style="color: var(--gold);">Admin</a></li>
              <li id="auth-nav-item">
                     <a href="/login.html" class="btn btn-small" id="auth-btn">Sign In</a>
                 </li>
+=======
+            <!-- <li><a href="/public/admin.html" style="color: var(--gold);">Admin</a></li> -->
+>>>>>>> 041eeeb9f6c813f25c1bd6b749f0a3bf1f395d55
           </ul>
           <button class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
@@ -661,7 +691,7 @@
           experience. Our expert team specializes in wig installations, nail
           care, and professional makeup services in Accra, Ghana.
         </p>
-        <a href="/booking" class="btn btn-gold">Book Now</a>
+        <a href="/public/booking.html" class="btn btn-gold">Book Now</a>
       </div>
     </section>
 
@@ -740,7 +770,12 @@
               </p>
               <div class="service-price">From 20 cedis</div>
             </div>
+            
+
           </div>
+          <div class="for-more-container">
+              <a href="/public/services.html" class="for-more-btn">For more →</a>
+              </div>
         </div>
       </div>
     </section>
@@ -779,7 +814,7 @@
             <p>Secure your appointment with our easy payment system</p>
           </div>
         </div>
-        <a href="/booking" class="btn btn-gold">Book Appointment Now</a>
+        <a href="/public/booking.html" class="btn btn-gold">Book Appointment Now</a>
       </div>
     </section>
 
@@ -963,10 +998,8 @@
               </div>
             </div>
             <div class="map-container">
-              <i
-                class="fas fa-map-marked-alt fa-3x"
-                style="color: var(--emerald)"
-              ></i>
+               
+                <iframe src="https://www.google.com/maps/embed?pb=!4v1762833988126!6m8!1m7!1sU2mowNJQ9LPPq7iVAh504w!2m2!1d5.594498232994296!2d-0.2697496733321197!3f39.331794340373314!4f-20.00606513317996!5f0.7820865974627469" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
           </div>
           <div class="contact-form">
