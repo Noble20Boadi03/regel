@@ -759,7 +759,7 @@
         </div>
     </footer>
 
-    <script type="module">
+    <!-- <script type="module">
         // Firebase Authentication
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
@@ -1178,6 +1178,455 @@
                 }
             });
         });
-    </script>
+    </script> -->
+
+    <script type="module">
+    // Firebase Authentication
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        updateProfile, 
+        signInWithPopup, 
+        GoogleAuthProvider, 
+        FacebookAuthProvider 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { 
+        getFirestore, 
+        doc, 
+        setDoc,
+        collection,
+        query,
+        where,
+        getDocs
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+        authDomain: "gegel-glit-glam.firebaseapp.com",
+        projectId: "gegel-glit-glam",
+        storageBucket: "gegel-glit-glam.firebasestorage.app",
+        messagingSenderId: "105374344569",
+        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+    };
+
+    // Initialize Firebase with error handling
+    let app, auth, db;
+    
+    try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        
+        console.log('Firebase initialized successfully');
+        
+        // Test Firebase connection
+        auth.onAuthStateChanged((user) => {
+            console.log('Firebase Auth state change detected');
+        });
+        
+    } catch (error) {
+        console.error('Firebase initialization error:', error);
+        showNotification('Service temporarily unavailable. Please try again later.', 'error');
+    }
+
+    const googleProvider = new GoogleAuthProvider();
+    const facebookProvider = new FacebookAuthProvider();
+
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (mobileMenuBtn && navLinks) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+    }
+
+    // Header Scroll Effect
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('header');
+        if (header) {
+            if (window.scrollY > 100) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        }
+    });
+
+    // Toggle Password Visibility
+    function togglePassword(inputId, toggleIcon) {
+        const passwordInput = document.getElementById(inputId);
+        if (!passwordInput) return;
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.className = 'fas fa-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.className = 'fas fa-eye';
+        }
+    }
+
+    // Password Strength Checker
+    function checkPasswordStrength() {
+        const passwordInput = document.getElementById('password');
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthText = document.getElementById('strength-text');
+        
+        if (!passwordInput || !strengthFill || !strengthText) return;
+        
+        const password = passwordInput.value;
+        let strength = 0;
+
+        // Length check
+        if (password.length >= 8) strength += 1;
+        
+        // Lowercase check
+        if (/[a-z]/.test(password)) strength += 1;
+        
+        // Uppercase check
+        if (/[A-Z]/.test(password)) strength += 1;
+        
+        // Number check
+        if (/[0-9]/.test(password)) strength += 1;
+        
+        // Special character check
+        if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+        // Update strength bar and text
+        strengthFill.className = 'strength-fill';
+        if (strength === 0) {
+            strengthText.textContent = 'Password strength';
+            strengthFill.style.width = '0%';
+        } else if (strength <= 2) {
+            strengthText.textContent = 'Weak';
+            strengthFill.classList.add('strength-weak');
+        } else if (strength <= 4) {
+            strengthText.textContent = 'Medium';
+            strengthFill.classList.add('strength-medium');
+        } else {
+            strengthText.textContent = 'Strong';
+            strengthFill.classList.add('strength-strong');
+        }
+    }
+
+    // Event Listeners for Password Toggle
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
+    
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', () => {
+            const toggleIcon = togglePasswordBtn.querySelector('i');
+            togglePassword('password', toggleIcon);
+        });
+    }
+    
+    if (toggleConfirmPasswordBtn) {
+        toggleConfirmPasswordBtn.addEventListener('click', () => {
+            const toggleIcon = toggleConfirmPasswordBtn.querySelector('i');
+            togglePassword('confirmPassword', toggleIcon);
+        });
+    }
+
+    // Event Listener for Password Strength
+    const passwordInput = document.getElementById('password');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', checkPasswordStrength);
+    }
+
+    // Check if email already exists
+    async function checkEmailExists(email) {
+        if (!db) {
+            throw new Error('Database not initialized');
+        }
+        
+        try {
+            const usersQuery = query(
+                collection(db, 'users'), 
+                where('email', '==', email.toLowerCase())
+            );
+            const querySnapshot = await getDocs(usersQuery);
+            return !querySnapshot.empty;
+        } catch (error) {
+            console.error('Error checking email:', error);
+            throw error;
+        }
+    }
+
+    // Register Form Submission
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Check if Firebase is initialized
+            if (!auth || !db) {
+                showNotification('Service temporarily unavailable. Please try again later.', 'error');
+                return;
+            }
+            
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const newsletter = document.getElementById('newsletter').checked;
+
+            // Validate required fields
+            if (!firstName || !lastName || !email || !password) {
+                showNotification('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match. Please try again.', 'error');
+                return;
+            }
+
+            // Validate password strength
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            try {
+                // Check if email already exists
+                const emailExists = await checkEmailExists(email);
+                if (emailExists) {
+                    showNotification('This email is already registered. Please sign in instead.', 'error');
+                    return;
+                }
+
+                // Create user with email and password
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Update user profile with display name
+                await updateProfile(user, {
+                    displayName: `${firstName} ${lastName}`
+                });
+
+                // Save additional user data to Firestore
+                const userData = {
+                    uid: user.uid,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone || '',
+                    newsletter: newsletter,
+                    createdAt: new Date(),
+                    role: 'customer',
+                    emailVerified: false,
+                    lastLogin: new Date()
+                };
+
+                await setDoc(doc(db, 'users', user.uid), userData);
+
+                // Show success message
+                showNotification('Account created successfully! Welcome to Regel Glit Glam.', 'success');
+                
+                // Redirect to home page after successful registration
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                let errorMessage = 'Registration failed. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already registered. Please sign in instead.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address format.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please choose a stronger password.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection.';
+                        break;
+                    case 'auth/configuration-not-found':
+                        errorMessage = 'Service configuration error. Please contact support.';
+                        break;
+                }
+                
+                showNotification(errorMessage, 'error');
+            }
+        });
+    }
+
+    // Social Sign Up Functions
+    async function handleSocialSignUp(provider, providerName) {
+        if (!auth) {
+            showNotification('Service temporarily unavailable. Please try again later.', 'error');
+            return;
+        }
+
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            // Check if user already exists in Firestore
+            const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', user.uid)));
+            
+            if (userDoc.empty) {
+                // Save new user data to Firestore
+                const userData = {
+                    uid: user.uid,
+                    firstName: user.displayName?.split(' ')[0] || '',
+                    lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+                    email: user.email,
+                    createdAt: new Date(),
+                    role: 'customer',
+                    provider: providerName,
+                    emailVerified: user.emailVerified,
+                    lastLogin: new Date()
+                };
+
+                await setDoc(doc(db, 'users', user.uid), userData);
+            } else {
+                // Update last login for existing user
+                await setDoc(doc(db, 'users', user.uid), {
+                    lastLogin: new Date()
+                }, { merge: true });
+            }
+
+            showNotification(`${providerName} registration successful!`, 'success');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+            
+        } catch (error) {
+            console.error(`${providerName} sign-up error:`, error);
+            let errorMessage = `${providerName} registration failed. Please try again.`;
+            
+            if (error.code === 'auth/popup-closed-by-user') {
+                errorMessage = `${providerName} sign-up was cancelled.`;
+            } else if (error.code === 'auth/popup-blocked') {
+                errorMessage = 'Popup was blocked. Please allow popups for this site.';
+            } else if (error.code === 'auth/account-exists-with-different-credential') {
+                errorMessage = 'An account already exists with the same email but different sign-in method.';
+            } else if (error.code === 'auth/configuration-not-found') {
+                errorMessage = 'Service configuration error. Please contact support.';
+            }
+            
+            showNotification(errorMessage, 'error');
+        }
+    }
+
+    // Google Sign Up
+    const googleSignUpBtn = document.getElementById('googleSignUp');
+    if (googleSignUpBtn) {
+        googleSignUpBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await handleSocialSignUp(googleProvider, 'Google');
+        });
+    }
+
+    // Facebook Sign Up
+    const facebookSignUpBtn = document.getElementById('facebookSignUp');
+    if (facebookSignUpBtn) {
+        facebookSignUpBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await handleSocialSignUp(facebookProvider, 'Facebook');
+        });
+    }
+
+    // Show Notification
+    function showNotification(message, type) {
+        // Remove any existing notifications
+        const existingNotifications = document.querySelectorAll('.custom-notification');
+        existingNotifications.forEach(notification => notification.remove());
+
+        const notification = document.createElement('div');
+        notification.className = 'custom-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: ${type === 'success' ? 'var(--emerald)' : '#dc3545'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="margin-right: 8px;"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    // Add CSS for notification animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Smooth Scrolling for Anchor Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                if (navLinks && navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
