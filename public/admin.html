@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-          /* Your existing CSS styles remain exactly the same */
+        /* Your existing CSS styles remain exactly the same */
         :root {
             --emerald: #FFB6C1;
             --emerald-light: #FF91A4;
@@ -618,17 +618,15 @@
     <header id="header">
         <div class="container">
             <nav class="navbar">
-                <a href="/" class="logo">
+                <a href="#" class="logo">
                     <i class="fas fa-spa"></i>
                     Regel Glit Glam
                 </a>
                 <ul class="nav-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/#services">Services</a></li>
-                    <li><a href="/booking.html">Book Now</a></li>
-                    <li><a href="/#gallery">Gallery</a></li>
-                    <li><a href="/#contact">Contact</a></li>
-                    <li><a href="/admin.html" style="color: var(--gold);">Admin</a></li>
+                    <li><a href="#" style="color: var(--gold);">Admin Dashboard</a></li>
+                    <li><a href="#" id="admin-logout" style="color: #dc3545;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a></li>
                 </ul>
                 <button class="mobile-menu-btn">
                     <i class="fas fa-bars"></i>
@@ -877,453 +875,470 @@
     </div>
 
     <script type="module">
-    // Import Firebase functions
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { 
-        getFirestore, 
-        collection, 
-        getDoc, 
-        addDoc, 
-        updateDoc, 
-        doc, 
-        query, 
-        orderBy, 
-        where,
-        onSnapshot 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { 
-    getAuth, 
-    onAuthStateChanged, 
-    signOut 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            addDoc, 
+            updateDoc, 
+            deleteDoc, 
+            doc, 
+            query, 
+            orderBy, 
+            where,
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
-        authDomain: "gegel-glit-glam.firebaseapp.com",
-        projectId: "gegel-glit-glam",
-        storageBucket: "gegel-glit-glam.firebasestorage.app",
-        messagingSenderId: "105374344569",
-        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+            authDomain: "gegel-glit-glam.firebaseapp.com",
+            projectId: "gegel-glit-glam",
+            storageBucket: "gegel-glit-glam.firebasestorage.app",
+            messagingSenderId: "105374344569",
+            appId: "1:105374644569:web:0ce7b1c9d5f2050eed7ba8"
+        };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
 
-
-        // Check if user is authenticated and is admin
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            // Redirect to login if not authenticated
-            window.location.href = '/login?redirect=admin';
-            return;
-        }
-        
-        // Check if user has admin role
-        try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                if (userData.role !== 'admin') {
-                    // Redirect to home if not admin
-                    showNotification('Access denied. Admin privileges required.', 'error');
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                    return;
-                }
-            } else {
-                // Redirect if user document doesn't exist
-                window.location.href = '/login?redirect=admin';
+        // Check if user is admin (using sessionStorage from login)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check admin authentication
+            const isAdmin = sessionStorage.getItem('adminUser') === 'true';
+            
+            if (!isAdmin) {
+                // Redirect to login if not admin
+                alert('Access denied. Please log in as admin.');
+                window.location.href = '/login';
                 return;
             }
-        } catch (error) {
-            console.error('Error checking admin status:', error);
-            window.location.href = '/login?redirect=admin';
-            return;
-        }
-        
-        // User is authenticated and is admin, load admin content
-        loadStatistics();
-        loadBookings();
-        loadServices();
-        loadCustomers();
-    });
 
-    // Add logout functionality to admin page
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add logout button to admin page if not exists
-        const adminNav = document.querySelector('.nav-links');
-        if (adminNav) {
-            const logoutItem = document.createElement('li');
-            logoutItem.innerHTML = `
-                <a href="#" id="admin-logout" style="color: #dc3545;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            `;
-            adminNav.appendChild(logoutItem);
-            
-            document.getElementById('admin-logout').addEventListener('click', (e) => {
-                e.preventDefault();
-                signOut(auth).then(() => {
-                    window.location.href = '/';
-                });
-            });
-        }
-    });
-
-
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-
-    mobileMenuBtn.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
-            ? '<i class="fas fa-times"></i>' 
-            : '<i class="fas fa-bars"></i>';
-    });
-
-    // Header Scroll Effect
-    window.addEventListener('scroll', () => {
-        const header = document.getElementById('header');
-        if (window.scrollY > 100) {
-            header.classList.add('header-scrolled');
-        } else {
-            header.classList.remove('header-scrolled');
-        }
-    });
-
-    // Tab Management
-    window.showTab = function(tabName) {
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Show selected tab and activate button
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-        event.currentTarget.classList.add('active');
-    };
-
-    // Modal Management
-    window.showServiceModal = function(service = null) {
-        const modal = document.getElementById('serviceModal');
-        const title = document.getElementById('serviceModalTitle');
-        const form = document.getElementById('serviceForm');
-        
-        if (service) {
-            title.textContent = 'Edit Service';
-            // Populate form with service data
-            document.getElementById('serviceName').value = service.service_name;
-            document.getElementById('serviceCategory').value = service.category;
-            document.getElementById('servicePrice').value = service.price;
-            document.getElementById('serviceDuration').value = service.duration;
-            document.getElementById('serviceDescription').value = service.description;
-            document.getElementById('serviceImage').value = service.image_url || '';
-            // Store service ID for update
-            form.dataset.editId = service.id;
-        } else {
-            title.textContent = 'Add New Service';
-            form.reset();
-            delete form.dataset.editId;
-        }
-        
-        modal.style.display = 'flex';
-    };
-
-    window.closeServiceModal = function() {
-        document.getElementById('serviceModal').style.display = 'none';
-    };
-
-    // Load Statistics
-    async function loadStatistics() {
-        try {
-            // Total Bookings
-            const bookingsQuery = query(collection(db, 'bookings'));
-            const bookingsSnapshot = await getDocs(bookingsQuery);
-            document.getElementById('total-bookings').textContent = bookingsSnapshot.size;
-            
-            // Pending Bookings
-            const pendingQuery = query(collection(db, 'bookings'), where('status', '==', 'Pending'));
-            const pendingSnapshot = await getDocs(pendingQuery);
-            document.getElementById('pending-bookings').textContent = pendingSnapshot.size;
-            
-            // Active Services
-            const servicesQuery = query(collection(db, 'services'), where('is_active', '==', true));
-            const servicesSnapshot = await getDocs(servicesQuery);
-            document.getElementById('total-services').textContent = servicesSnapshot.size;
-            
-            // Total Customers (count unique emails from bookings)
-            const customers = new Set();
-            bookingsSnapshot.forEach(doc => {
-                const booking = doc.data();
-                if (booking.customer_info && booking.customer_info.email) {
-                    customers.add(booking.customer_info.email);
-                }
-            });
-            document.getElementById('total-customers').textContent = customers.size;
-            
-        } catch (error) {
-            console.error('Error loading statistics:', error);
-        }
-    }
-
-    // Load Bookings
-    async function loadBookings() {
-        try {
-            const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
-            const querySnapshot = await getDocs(bookingsQuery);
-            const tbody = document.getElementById('bookings-body');
-            tbody.innerHTML = '';
-            
-            querySnapshot.forEach((doc) => {
-                const booking = doc.data();
-                const row = `
-                    <tr>
-                        <td>${doc.id.substring(0, 8)}...</td>
-                        <td>
-                            <strong>${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}</strong><br>
-                            <small>${booking.customer_info?.email || 'No email'}</small>
-                        </td>
-                        <td>
-                            ${booking.booking_date ? new Date(booking.booking_date).toLocaleDateString() : 'N/A'}<br>
-                            <small>${booking.booking_time || 'N/A'}</small>
-                        </td>
-                        <td>${booking.service_ids?.length || 0} services</td>
-                        <td>GHS ${booking.total_price || 0}</td>
-                        <td>
-                            <span class="status-badge status-${booking.status?.toLowerCase() || 'pending'}">
-                                ${booking.status || 'Pending'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px;">
-                                    <option value="Pending" ${booking.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="Confirmed" ${booking.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                                    <option value="Completed" ${booking.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                                    <option value="Cancelled" ${booking.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-            
-        } catch (error) {
-            console.error('Error loading bookings:', error);
-        }
-    }
-
-    // Load Services
-    async function loadServices() {
-        try {
-            const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
-            const querySnapshot = await getDocs(servicesQuery);
-            const tbody = document.getElementById('services-body');
-            tbody.innerHTML = '';
-            
-            querySnapshot.forEach((doc) => {
-                const service = doc.data();
-                const row = `
-                    <tr>
-                        <td>${service.service_name}</td>
-                        <td>${service.category || 'General'}</td>
-                        <td>GHS ${service.price}</td>
-                        <td>${service.duration}</td>
-                        <td>
-                            <span class="status-badge ${service.is_active ? 'status-completed' : 'status-cancelled'}">
-                                ${service.is_active ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-small" onclick="showServiceModal(${JSON.stringify({id: doc.id, ...service}).replace(/"/g, '&quot;')})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-small btn-danger" onclick="toggleServiceStatus('${doc.id}', ${!service.is_active})">
-                                    <i class="fas ${service.is_active ? 'fa-times' : 'fa-check'}"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-            
-        } catch (error) {
-            console.error('Error loading services:', error);
-        }
-    }
-
-    // Load Customers
-    async function loadCustomers() {
-        try {
-            const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
-            const customers = {};
-            
-            bookingsSnapshot.forEach(doc => {
-                const booking = doc.data();
-                if (booking.customer_info && booking.customer_info.email) {
-                    const email = booking.customer_info.email;
-                    if (!customers[email]) {
-                        customers[email] = {
-                            name: `${booking.customer_info.first_name || ''} ${booking.customer_info.last_name || ''}`.trim(),
-                            email: email,
-                            phone: booking.customer_info.phone || 'N/A',
-                            totalBookings: 0,
-                            lastVisit: null
-                        };
-                    }
-                    customers[email].totalBookings++;
-                    
-                    const bookingDate = booking.booking_date ? new Date(booking.booking_date) : new Date();
-                    if (!customers[email].lastVisit || bookingDate > customers[email].lastVisit) {
-                        customers[email].lastVisit = bookingDate;
-                    }
-                }
-            });
-            
-            const tbody = document.getElementById('customers-body');
-            tbody.innerHTML = '';
-            
-            Object.values(customers).forEach(customer => {
-                const row = `
-                    <tr>
-                        <td>${customer.name || 'Unknown'}</td>
-                        <td>${customer.email}</td>
-                        <td>${customer.phone}</td>
-                        <td>${customer.totalBookings}</td>
-                        <td>${customer.lastVisit ? customer.lastVisit.toLocaleDateString() : 'N/A'}</td>
-                        <td>
-                            <button class="btn btn-small" onclick="viewCustomerHistory('${customer.email}')">
-                                <i class="fas fa-history"></i> History
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-            
-        } catch (error) {
-            console.error('Error loading customers:', error);
-        }
-    }
-
-    // Update Booking Status
-    window.updateBookingStatus = async function(bookingId, newStatus) {
-        try {
-            const bookingRef = doc(db, 'bookings', bookingId);
-            await updateDoc(bookingRef, {
-                status: newStatus
-            });
-            alert('Booking status updated successfully!');
+            // Load admin content
+            loadStatistics();
             loadBookings();
-            loadStatistics();
-        } catch (error) {
-            console.error('Error updating booking status:', error);
-            alert('Error updating booking status');
-        }
-    };
-
-    // Toggle Service Status
-    window.toggleServiceStatus = async function(serviceId, newStatus) {
-        try {
-            const serviceRef = doc(db, 'services', serviceId);
-            await updateDoc(serviceRef, {
-                is_active: newStatus
-            });
-            alert('Service status updated successfully!');
             loadServices();
-            loadStatistics();
-        } catch (error) {
-            console.error('Error updating service status:', error);
-            alert('Error updating service status');
-        }
-    };
+            loadCustomers();
 
-    // Service Form Handler
-    document.getElementById('serviceForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const serviceData = {
-            service_name: document.getElementById('serviceName').value,
-            category: document.getElementById('serviceCategory').value,
-            price: parseFloat(document.getElementById('servicePrice').value),
-            duration: document.getElementById('serviceDuration').value,
-            description: document.getElementById('serviceDescription').value,
-            image_url: document.getElementById('serviceImage').value || '',
-            is_active: true
-        };
-        
-        try {
-            if (this.dataset.editId) {
-                // Update existing service
-                const serviceRef = doc(db, 'services', this.dataset.editId);
-                await updateDoc(serviceRef, serviceData);
+            // Setup logout functionality
+            document.getElementById('admin-logout').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Clear admin session
+                sessionStorage.removeItem('adminUser');
+                sessionStorage.removeItem('userEmail');
+                // Redirect to home page
+                window.location.href = '/';
+            });
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('header-scrolled');
             } else {
-                // Add new service
-                await addDoc(collection(db, 'services'), serviceData);
+                header.classList.remove('header-scrolled');
+            }
+        });
+
+        // Tab Management
+        window.showTab = function(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab and activate button
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
+        // Modal Management
+        window.showServiceModal = function(service = null) {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('serviceModalTitle');
+            const form = document.getElementById('serviceForm');
+            
+            if (service) {
+                title.textContent = 'Edit Service';
+                // Populate form with service data
+                document.getElementById('serviceName').value = service.service_name;
+                document.getElementById('serviceCategory').value = service.category;
+                document.getElementById('servicePrice').value = service.price;
+                document.getElementById('serviceDuration').value = service.duration;
+                document.getElementById('serviceDescription').value = service.description;
+                document.getElementById('serviceImage').value = service.image_url || '';
+                // Store service ID for update
+                form.dataset.editId = service.id;
+            } else {
+                title.textContent = 'Add New Service';
+                form.reset();
+                delete form.dataset.editId;
             }
             
-            closeServiceModal();
-            loadServices();
-            loadStatistics();
-            alert('Service saved successfully!');
-            
-        } catch (error) {
-            console.error('Error saving service:', error);
-            alert('Error saving service');
+            modal.style.display = 'flex';
+        };
+
+        window.closeServiceModal = function() {
+            document.getElementById('serviceModal').style.display = 'none';
+        };
+
+        // Load Statistics from Firebase
+        async function loadStatistics() {
+            try {
+                // Total Bookings
+                const bookingsQuery = query(collection(db, 'bookings'));
+                const bookingsSnapshot = await getDocs(bookingsQuery);
+                document.getElementById('total-bookings').textContent = bookingsSnapshot.size;
+                
+                // Pending Bookings
+                const pendingQuery = query(collection(db, 'bookings'), where('status', '==', 'Pending'));
+                const pendingSnapshot = await getDocs(pendingQuery);
+                document.getElementById('pending-bookings').textContent = pendingSnapshot.size;
+                
+                // Active Services
+                const servicesQuery = query(collection(db, 'services'), where('is_active', '==', true));
+                const servicesSnapshot = await getDocs(servicesQuery);
+                document.getElementById('total-services').textContent = servicesSnapshot.size;
+                
+                // Total Customers (count unique emails from bookings)
+                const customers = new Set();
+                bookingsSnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    if (booking.customer_info && booking.customer_info.email) {
+                        customers.add(booking.customer_info.email);
+                    }
+                });
+                document.getElementById('total-customers').textContent = customers.size;
+                
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                // Fallback to mock data if Firebase fails
+                document.getElementById('total-bookings').textContent = '0';
+                document.getElementById('pending-bookings').textContent = '0';
+                document.getElementById('total-services').textContent = '0';
+                document.getElementById('total-customers').textContent = '0';
+            }
         }
-    });
 
-    // Initialize the admin dashboard
-    document.addEventListener('DOMContentLoaded', function() {
-        loadStatistics();
-        loadBookings();
-        loadServices();
-        loadCustomers();
-        
-        // Real-time listener for bookings
-        const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
-        onSnapshot(bookingsQuery, () => {
-            loadStatistics();
-            loadBookings();
-            loadCustomers();
-        });
-    });
-
-    // Smooth Scrolling for Anchor Links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
+        // Load Bookings from Firebase
+        async function loadBookings() {
+            try {
+                const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
+                const querySnapshot = await getDocs(bookingsQuery);
+                const tbody = document.getElementById('bookings-body');
+                tbody.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No bookings found</td></tr>';
+                    return;
+                }
+                
+                querySnapshot.forEach((doc) => {
+                    const booking = doc.data();
+                    const bookingDate = booking.booking_date ? new Date(booking.booking_date.seconds * 1000).toLocaleDateString() : 'N/A';
+                    const servicesCount = booking.service_ids ? booking.service_ids.length : 0;
+                    
+                    const row = `
+                        <tr>
+                            <td>${doc.id.substring(0, 8)}...</td>
+                            <td>
+                                <strong>${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}</strong><br>
+                                <small>${booking.customer_info?.email || 'No email'}</small>
+                            </td>
+                            <td>
+                                ${bookingDate}<br>
+                                <small>${booking.booking_time || 'N/A'}</small>
+                            </td>
+                            <td>${servicesCount} services</td>
+                            <td>GHS ${booking.total_price || 0}</td>
+                            <td>
+                                <span class="status-badge status-${(booking.status || 'pending').toLowerCase()}">
+                                    ${booking.status || 'Pending'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px;">
+                                        <option value="Pending" ${(booking.status || 'Pending') === 'Pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="Confirmed" ${(booking.status || 'Pending') === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                        <option value="Completed" ${(booking.status || 'Pending') === 'Completed' ? 'selected' : ''}>Completed</option>
+                                        <option value="Cancelled" ${(booking.status || 'Pending') === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
                 });
                 
-                // Close mobile menu if open
-                if (navLinks.classList.contains('active')) {
-                    navLinks.classList.remove('active');
-                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                const tbody = document.getElementById('bookings-body');
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #dc3545;">Error loading bookings</td></tr>';
+            }
+        }
+
+        // Load Services from Firebase
+        async function loadServices() {
+            try {
+                const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
+                const querySnapshot = await getDocs(servicesQuery);
+                const tbody = document.getElementById('services-body');
+                tbody.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No services found</td></tr>';
+                    return;
                 }
+                
+                querySnapshot.forEach((doc) => {
+                    const service = doc.data();
+                    const row = `
+                        <tr>
+                            <td>${service.service_name}</td>
+                            <td>${service.category || 'General'}</td>
+                            <td>GHS ${service.price}</td>
+                            <td>${service.duration}</td>
+                            <td>
+                                <span class="status-badge ${service.is_active ? 'status-completed' : 'status-cancelled'}">
+                                    ${service.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-small" onclick="showServiceModal(${JSON.stringify({id: doc.id, ...service}).replace(/"/g, '&quot;')})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-small btn-danger" onclick="toggleServiceStatus('${doc.id}', ${!service.is_active})">
+                                        <i class="fas ${service.is_active ? 'fa-times' : 'fa-check'}"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+            } catch (error) {
+                console.error('Error loading services:', error);
+                const tbody = document.getElementById('services-body');
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #dc3545;">Error loading services</td></tr>';
+            }
+        }
+
+        // Load Customers from Firebase
+        async function loadCustomers() {
+            try {
+                const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
+                const customers = {};
+                
+                bookingsSnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    if (booking.customer_info && booking.customer_info.email) {
+                        const email = booking.customer_info.email;
+                        if (!customers[email]) {
+                            customers[email] = {
+                                name: `${booking.customer_info.first_name || ''} ${booking.customer_info.last_name || ''}`.trim() || 'Unknown',
+                                email: email,
+                                phone: booking.customer_info.phone || 'N/A',
+                                totalBookings: 0,
+                                lastVisit: null
+                            };
+                        }
+                        customers[email].totalBookings++;
+                        
+                        const bookingDate = booking.booking_date ? new Date(booking.booking_date.seconds * 1000) : new Date();
+                        if (!customers[email].lastVisit || bookingDate > customers[email].lastVisit) {
+                            customers[email].lastVisit = bookingDate;
+                        }
+                    }
+                });
+                
+                const tbody = document.getElementById('customers-body');
+                tbody.innerHTML = '';
+                
+                if (Object.keys(customers).length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No customers found</td></tr>';
+                    return;
+                }
+                
+                Object.values(customers).forEach(customer => {
+                    const row = `
+                        <tr>
+                            <td>${customer.name}</td>
+                            <td>${customer.email}</td>
+                            <td>${customer.phone}</td>
+                            <td>${customer.totalBookings}</td>
+                            <td>${customer.lastVisit ? customer.lastVisit.toLocaleDateString() : 'N/A'}</td>
+                            <td>
+                                <button class="btn btn-small" onclick="viewCustomerHistory('${customer.email}')">
+                                    <i class="fas fa-history"></i> History
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                const tbody = document.getElementById('customers-body');
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #dc3545;">Error loading customers</td></tr>';
+            }
+        }
+
+        // Update Booking Status
+        window.updateBookingStatus = async function(bookingId, newStatus) {
+            try {
+                const bookingRef = doc(db, 'bookings', bookingId);
+                await updateDoc(bookingRef, {
+                    status: newStatus
+                });
+                alert('Booking status updated successfully!');
+                loadBookings();
+                loadStatistics();
+            } catch (error) {
+                console.error('Error updating booking status:', error);
+                alert('Error updating booking status');
+            }
+        };
+
+        // Toggle Service Status
+        window.toggleServiceStatus = async function(serviceId, newStatus) {
+            try {
+                const serviceRef = doc(db, 'services', serviceId);
+                await updateDoc(serviceRef, {
+                    is_active: newStatus
+                });
+                alert('Service status updated successfully!');
+                loadServices();
+                loadStatistics();
+            } catch (error) {
+                console.error('Error updating service status:', error);
+                alert('Error updating service status');
+            }
+        };
+
+        // Service Form Handler
+        document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const serviceData = {
+                service_name: document.getElementById('serviceName').value,
+                category: document.getElementById('serviceCategory').value,
+                price: parseFloat(document.getElementById('servicePrice').value),
+                duration: document.getElementById('serviceDuration').value,
+                description: document.getElementById('serviceDescription').value,
+                image_url: document.getElementById('serviceImage').value || '',
+                is_active: true,
+                created_at: new Date()
+            };
+            
+            try {
+                if (this.dataset.editId) {
+                    // Update existing service
+                    const serviceRef = doc(db, 'services', this.dataset.editId);
+                    await updateDoc(serviceRef, serviceData);
+                } else {
+                    // Add new service
+                    await addDoc(collection(db, 'services'), serviceData);
+                }
+                
+                closeServiceModal();
+                loadServices();
+                loadStatistics();
+                alert('Service saved successfully!');
+                
+            } catch (error) {
+                console.error('Error saving service:', error);
+                alert('Error saving service');
             }
         });
-    });
-</script>
+
+        // View Customer History
+        window.viewCustomerHistory = async function(customerEmail) {
+            try {
+                const bookingsQuery = query(
+                    collection(db, 'bookings'), 
+                    where('customer_info.email', '==', customerEmail),
+                    orderBy('created_at', 'desc')
+                );
+                const querySnapshot = await getDocs(bookingsQuery);
+                
+                let historyMessage = `Booking history for ${customerEmail}:\n\n`;
+                querySnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    const date = booking.booking_date ? new Date(booking.booking_date.seconds * 1000).toLocaleDateString() : 'N/A';
+                    historyMessage += `• ${date} - ${booking.booking_time || 'N/A'} - ${booking.status || 'Pending'} - GHS ${booking.total_price || 0}\n`;
+                });
+                
+                alert(historyMessage);
+            } catch (error) {
+                console.error('Error fetching customer history:', error);
+                alert('Error loading customer history');
+            }
+        };
+
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+
+        // Real-time listeners for data updates
+        document.addEventListener('DOMContentLoaded', function() {
+            // Real-time listener for bookings
+            const bookingsQuery = query(collection(db, 'bookings'), orderBy('created_at', 'desc'));
+            onSnapshot(bookingsQuery, () => {
+                loadStatistics();
+                loadBookings();
+                loadCustomers();
+            });
+
+            // Real-time listener for services
+            const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
+            onSnapshot(servicesQuery, () => {
+                loadStatistics();
+                loadServices();
+            });
+        });
+    </script>
 </body>
 </html>

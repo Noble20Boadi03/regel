@@ -720,6 +720,10 @@
         const googleProvider = new GoogleAuthProvider();
         const facebookProvider = new FacebookAuthProvider();
 
+        // Admin credentials (replace with your desired admin credentials)
+        const ADMIN_EMAIL = "admin@regelglitglam.com";
+        const ADMIN_PASSWORD = "Admin123!";
+
         // Mobile Menu Toggle
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
@@ -764,6 +768,25 @@
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
 
+            // Check if credentials match admin credentials
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                console.log('Admin login successful');
+                
+                // Create a simple admin session
+                sessionStorage.setItem('adminUser', 'true');
+                sessionStorage.setItem('userEmail', email);
+                
+                // Show success message
+                showNotification('Admin login successful! Redirecting to admin dashboard...', 'success');
+                
+                // Redirect to admin page
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 1500);
+                return;
+            }
+
+            // If not admin, proceed with Firebase authentication
             try {
                 // Set persistence based on remember me selection
                 const persistenceType = remember ? browserLocalPersistence : browserSessionPersistence;
