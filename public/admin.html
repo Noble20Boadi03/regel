@@ -882,7 +882,7 @@
     import { 
         getFirestore, 
         collection, 
-        getDocs, 
+        getDoc, 
         addDoc, 
         updateDoc, 
         doc, 
@@ -891,6 +891,11 @@
         where,
         onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
@@ -901,9 +906,73 @@
         appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
     };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+
+        // Check if user is authenticated and is admin
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // Redirect to login if not authenticated
+            window.location.href = '/login?redirect=admin';
+            return;
+        }
+        
+        // Check if user has admin role
+        try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                if (userData.role !== 'admin') {
+                    // Redirect to home if not admin
+                    showNotification('Access denied. Admin privileges required.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                    return;
+                }
+            } else {
+                // Redirect if user document doesn't exist
+                window.location.href = '/login?redirect=admin';
+                return;
+            }
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            window.location.href = '/login?redirect=admin';
+            return;
+        }
+        
+        // User is authenticated and is admin, load admin content
+        loadStatistics();
+        loadBookings();
+        loadServices();
+        loadCustomers();
+    });
+
+    // Add logout functionality to admin page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add logout button to admin page if not exists
+        const adminNav = document.querySelector('.nav-links');
+        if (adminNav) {
+            const logoutItem = document.createElement('li');
+            logoutItem.innerHTML = `
+                <a href="#" id="admin-logout" style="color: #dc3545;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            `;
+            adminNav.appendChild(logoutItem);
+            
+            document.getElementById('admin-logout').addEventListener('click', (e) => {
+                e.preventDefault();
+                signOut(auth).then(() => {
+                    window.location.href = '/';
+                });
+            });
+        }
+    });
+
 
     // Mobile Menu Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');

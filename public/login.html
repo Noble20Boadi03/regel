@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Regel Glit Glam</title>
+    <title>Login | Regel Glit Glam</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -187,7 +187,7 @@
             right: -50%;
             width: 100%;
             height: 200%;
-            background: url('https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center/cover;
+            background: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80') no-repeat center center/cover;
             opacity: 0.1;
         }
 
@@ -250,12 +250,6 @@
             width: 100%;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
         .form-group {
             margin-bottom: 25px;
         }
@@ -301,56 +295,32 @@
             font-size: 1.1rem;
         }
 
-        .password-strength {
-            margin-top: 8px;
-            font-size: 0.85rem;
-        }
-
-        .strength-bar {
-            height: 4px;
-            background: var(--light-gray);
-            border-radius: 2px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-
-        .strength-fill {
-            height: 100%;
-            width: 0%;
-            transition: all 0.3s ease;
-        }
-
-        .strength-weak { background: #dc3545; width: 33%; }
-        .strength-medium { background: #ffc107; width: 66%; }
-        .strength-strong { background: #28a745; width: 100%; }
-
-        .terms-agreement {
+        .form-options {
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 25px;
         }
 
-        .terms-agreement input {
-            margin-top: 3px;
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remember-me input {
             width: 18px;
             height: 18px;
-            flex-shrink: 0;
         }
 
-        .terms-agreement label {
-            font-size: 0.9rem;
-            color: var(--gray);
-            line-height: 1.4;
-        }
-
-        .terms-agreement a {
+        .forgot-password {
             color: var(--emerald);
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.3s ease;
         }
 
-        .terms-agreement a:hover {
+        .forgot-password:hover {
             color: var(--emerald-light);
         }
 
@@ -552,10 +522,6 @@
                 padding: 40px 30px;
             }
 
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
             .social-auth {
                 grid-template-columns: 1fr;
             }
@@ -568,6 +534,12 @@
 
             .auth-form-header h2 {
                 font-size: 1.8rem;
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
             }
         }
     </style>
@@ -588,7 +560,7 @@
                     <li><a href="/#gallery">Gallery</a></li>
                     <li><a href="/#team">Our Team</a></li>
                     <li><a href="/#contact">Contact</a></li>
-                    <li><a href="/login" class="btn btn-small">Sign In</a></li>
+                    <li><a href="/register" class="btn btn-small">Sign Up</a></li>
                 </ul>
                 <button class="mobile-menu-btn">
                     <i class="fas fa-bars"></i>
@@ -603,92 +575,53 @@
             <div class="auth-container">
                 <!-- Welcome Side -->
                 <div class="auth-welcome">
-                    <h2>Join Our Beauty Community!</h2>
-                    <p>Create an account to unlock exclusive benefits and personalized beauty experiences tailored just for you.</p>
+                    <h2>Welcome Back!</h2>
+                    <p>We're thrilled to see you again. Access your personalized beauty experience and manage your appointments with ease.</p>
                     <ul class="welcome-features">
-                        <li><i class="fas fa-check-circle"></i> Easy appointment booking</li>
+                        <li><i class="fas fa-check-circle"></i> Manage your appointments</li>
+                        <li><i class="fas fa-check-circle"></i> View booking history</li>
+                        <li><i class="fas fa-check-circle"></i> Exclusive member offers</li>
                         <li><i class="fas fa-check-circle"></i> Personalized recommendations</li>
-                        <li><i class="fas fa-check-circle"></i> Exclusive member discounts</li>
-                        <li><i class="fas fa-check-circle"></i> Priority booking for events</li>
-                        <li><i class="fas fa-check-circle"></i> Track your beauty journey</li>
                     </ul>
                 </div>
 
-                <!-- Register Form -->
+                <!-- Login Form -->
                 <div class="auth-form-container">
                     <div class="auth-form-header">
-                        <h2>Create Account</h2>
-                        <p>Join us today and discover luxury beauty care</p>
+                        <h2>Sign In</h2>
+                        <p>Welcome back! Please enter your details</p>
                     </div>
 
-                    <form class="auth-form" id="registerForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" class="form-control" placeholder="Enter your first name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" class="form-control" placeholder="Enter your last name" required>
-                            </div>
-                        </div>
-
+                    <form class="auth-form" id="loginForm">
                         <div class="form-group">
                             <label for="email">Email Address</label>
                             <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number">
-                        </div>
-
-                        <div class="form-group">
                             <label for="password">Password</label>
                             <div class="password-input">
-                                <input type="password" id="password" class="form-control" placeholder="Create a password" required oninput="checkPasswordStrength()">
+                                <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
                                 <button type="button" class="toggle-password" onclick="togglePassword('password')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                            <div class="password-strength">
-                                <span id="strength-text">Password strength</span>
-                                <div class="strength-bar">
-                                    <div class="strength-fill" id="strength-fill"></div>
-                                </div>
+                        </div>
+
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">Remember me</label>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm Password</label>
-                            <div class="password-input">
-                                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
-                                <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="terms-agreement">
-                            <input type="checkbox" id="terms" required>
-                            <label for="terms">
-                                I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>. I understand that my data will be used to enhance my beauty experience.
-                            </label>
-                        </div>
-
-                        <div class="terms-agreement">
-                            <input type="checkbox" id="newsletter">
-                            <label for="newsletter">
-                                Yes, I'd like to receive exclusive offers, beauty tips, and updates from Regel Glit Glam.
-                            </label>
+                            <a href="/forgot-password" class="forgot-password">Forgot Password?</a>
                         </div>
 
                         <button type="submit" class="btn btn-gold" style="width: 100%;">
-                            Create Account
+                            Sign In
                         </button>
 
                         <div class="auth-divider">
-                            <span>Or sign up with</span>
+                            <span>Or continue with</span>
                         </div>
 
                         <div class="social-auth">
@@ -703,7 +636,7 @@
                         </div>
 
                         <div class="auth-switch">
-                            <p>Already have an account? <a href="/login">Sign in here</a></p>
+                            <p>Don't have an account? <a href="/register">Sign up here</a></p>
                         </div>
                     </form>
                 </div>
@@ -761,8 +694,16 @@
     <script type="module">
         // Firebase Authentication
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            FacebookAuthProvider,
+            setPersistence,
+            browserSessionPersistence,
+            browserLocalPersistence 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
@@ -776,7 +717,6 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
         const facebookProvider = new FacebookAuthProvider();
 
@@ -815,116 +755,61 @@
             }
         }
 
-        // Password Strength Checker
-        function checkPasswordStrength() {
-            const password = document.getElementById('password').value;
-            const strengthFill = document.getElementById('strength-fill');
-            const strengthText = document.getElementById('strength-text');
-            
-            let strength = 0;
-            let feedback = '';
-
-            // Length check
-            if (password.length >= 8) strength += 1;
-            
-            // Lowercase check
-            if (/[a-z]/.test(password)) strength += 1;
-            
-            // Uppercase check
-            if (/[A-Z]/.test(password)) strength += 1;
-            
-            // Number check
-            if (/[0-9]/.test(password)) strength += 1;
-            
-            // Special character check
-            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
-
-            // Update strength bar and text
-            strengthFill.className = 'strength-fill';
-            if (strength === 0) {
-                strengthText.textContent = 'Password strength';
-                strengthFill.style.width = '0%';
-            } else if (strength <= 2) {
-                strengthText.textContent = 'Weak';
-                strengthFill.classList.add('strength-weak');
-            } else if (strength <= 4) {
-                strengthText.textContent = 'Medium';
-                strengthFill.classList.add('strength-medium');
-            } else {
-                strengthText.textContent = 'Strong';
-                strengthFill.classList.add('strength-strong');
-            }
-        }
-
-        // Register Form Submission
-        const registerForm = document.getElementById('registerForm');
-        registerForm.addEventListener('submit', async (e) => {
+        // Login Form Submission
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
             const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
             const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const newsletter = document.getElementById('newsletter').checked;
-
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                showNotification('Passwords do not match. Please try again.', 'error');
-                return;
-            }
-
-            // Validate password strength
-            if (password.length < 6) {
-                showNotification('Password must be at least 6 characters long.', 'error');
-                return;
-            }
+            const remember = document.getElementById('remember').checked;
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                // Set persistence based on remember me selection
+                const persistenceType = remember ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistenceType);
+
+                // Sign in with email and password
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                // Update user profile
-                await updateProfile(user, {
-                    displayName: `${firstName} ${lastName}`
-                });
-
-                // Save additional user data to Firestore
-                await setDoc(doc(db, 'users', user.uid), {
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    phone: phone || '',
-                    newsletter: newsletter,
-                    createdAt: new Date(),
-                    role: 'customer'
-                });
-
-                // Show success message
-                showNotification('Account created successfully! Welcome to Regel Glit Glam.', 'success');
                 
-                // Redirect to home page after successful registration
+                console.log('User logged in successfully:', user);
+                
+                // Show success message
+                showNotification('Login successful! Redirecting...', 'success');
+                
+                // Check if user has admin role and redirect accordingly
                 setTimeout(() => {
+                    // You can add role-based redirection here if needed
+                    // For now, redirect all users to home page
                     window.location.href = '/';
-                }, 2000);
+                }, 1500);
                 
             } catch (error) {
-                console.error('Registration error:', error);
-                let errorMessage = 'Registration failed. Please try again.';
+                console.error('Login error:', error);
+                let errorMessage = 'Login failed. Please try again.';
                 
                 switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'This email is already registered. Please sign in instead.';
-                        break;
                     case 'auth/invalid-email':
-                        errorMessage = 'Invalid email address.';
+                        errorMessage = 'Invalid email address. Please check your email format.';
                         break;
-                    case 'auth/weak-password':
-                        errorMessage = 'Password is too weak. Please choose a stronger password.';
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled. Please contact support.';
                         break;
-                    case 'auth/operation-not-allowed':
-                        errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email. Please sign up first.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please try again or reset your password.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed login attempts. Please try again later.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection.';
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMessage = 'Invalid login credentials. Please check your email and password.';
                         break;
                 }
                 
@@ -932,67 +817,74 @@
             }
         });
 
-        // Google Sign Up
+        // Google Sign In
         document.querySelector('.social-btn.google').addEventListener('click', async (e) => {
             e.preventDefault();
             
             try {
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
-
-                // Save user data to Firestore
-                await setDoc(doc(db, 'users', user.uid), {
-                    firstName: user.displayName?.split(' ')[0] || '',
-                    lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-                    email: user.email,
-                    createdAt: new Date(),
-                    role: 'customer',
-                    provider: 'google'
-                }, { merge: true });
-
-                showNotification('Google registration successful!', 'success');
+                
+                console.log('Google sign-in successful:', user);
+                showNotification('Google login successful!', 'success');
+                
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1500);
                 
             } catch (error) {
-                console.error('Google sign-up error:', error);
-                showNotification('Google registration failed. Please try again.', 'error');
+                console.error('Google sign-in error:', error);
+                let errorMessage = 'Google sign-in failed. Please try again.';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Sign-in was cancelled. Please try again.';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup was blocked. Please allow popups for this site.';
+                }
+                
+                showNotification(errorMessage, 'error');
             }
         });
 
-        // Facebook Sign Up
+        // Facebook Sign In
         document.querySelector('.social-btn.facebook').addEventListener('click', async (e) => {
             e.preventDefault();
             
             try {
                 const result = await signInWithPopup(auth, facebookProvider);
                 const user = result.user;
-
-                // Save user data to Firestore
-                await setDoc(doc(db, 'users', user.uid), {
-                    firstName: user.displayName?.split(' ')[0] || '',
-                    lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-                    email: user.email,
-                    createdAt: new Date(),
-                    role: 'customer',
-                    provider: 'facebook'
-                }, { merge: true });
-
-                showNotification('Facebook registration successful!', 'success');
+                
+                console.log('Facebook sign-in successful:', user);
+                showNotification('Facebook login successful!', 'success');
+                
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1500);
                 
             } catch (error) {
-                console.error('Facebook sign-up error:', error);
-                showNotification('Facebook registration failed. Please try again.', 'error');
+                console.error('Facebook sign-in error:', error);
+                let errorMessage = 'Facebook sign-in failed. Please try again.';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Sign-in was cancelled. Please try again.';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup was blocked. Please allow popups for this site.';
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                    errorMessage = 'An account already exists with the same email but different sign-in method.';
+                }
+                
+                showNotification(errorMessage, 'error');
             }
         });
 
         // Show Notification
         function showNotification(message, type) {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.auth-notification');
+            existingNotifications.forEach(notification => notification.remove());
+
             const notification = document.createElement('div');
+            notification.className = 'auth-notification';
             notification.style.cssText = `
                 position: fixed;
                 top: 100px;
@@ -1005,6 +897,7 @@
                 z-index: 1001;
                 max-width: 300px;
                 animation: slideIn 0.3s ease;
+                font-family: 'Raleway', sans-serif;
             `;
             notification.innerHTML = `
                 <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="margin-right: 8px;"></i>
@@ -1034,6 +927,32 @@
                 from { transform: translateX(0); opacity: 1; }
                 to { transform: translateX(400px); opacity: 0; }
             }
+            
+            /* Loading state for button */
+            .btn-loading {
+                position: relative;
+                color: transparent !important;
+            }
+            
+            .btn-loading::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                top: 50%;
+                left: 50%;
+                margin-left: -10px;
+                margin-top: -10px;
+                border: 2px solid #ffffff;
+                border-radius: 50%;
+                border-right-color: transparent;
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
         `;
         document.head.appendChild(style);
 
@@ -1059,6 +978,16 @@
                     }
                 }
             });
+        });
+
+        // Auto-fill demo credentials for testing (remove in production)
+        document.addEventListener('DOMContentLoaded', function() {
+            // This is just for demo purposes - remove in production
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('demo') === 'true') {
+                document.getElementById('email').value = 'demo@regelglitglam.com';
+                document.getElementById('password').value = 'demopassword123';
+            }
         });
     </script>
 </body>
