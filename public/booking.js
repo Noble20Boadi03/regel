@@ -3,19 +3,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { 
     getAuth, 
-    onAuthStateChanged 
+    onAuthStateChanged,
+    signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 const firebaseConfig = {
-        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
-        authDomain: "gegel-glit-glam.firebaseapp.com",
-        projectId: "gegel-glit-glam",
-        storageBucket: "gegel-glit-glam.firebasestorage.app",
-        messagingSenderId: "105374344569",
-        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
-    };
+    apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+    authDomain: "gegel-glit-glam.firebaseapp.com",
+    projectId: "gegel-glit-glam",
+    storageBucket: "gegel-glit-glam.firebasestorage.app",
+    messagingSenderId: "105374344569",
+    appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Mobile Menu Toggle
 const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
@@ -214,6 +217,16 @@ if (bookingForm) {
     bookingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        // Check if user is logged in
+        const user = auth.currentUser;
+        const isAdmin = sessionStorage.getItem('adminUser') === 'true';
+        
+        if (!user && !isAdmin) {
+            alert("You must be logged in to book an appointment. Please log in or create an account.");
+            window.location.href = '/login';
+            return;
+        }
+
         // Validate form
         if (selectedServices.length === 0) {
             alert("Please select at least one service from the services page");
@@ -271,7 +284,11 @@ if (bookingForm) {
                 status: 'Pending',
                 total_price: totalPrice,
                 created_at: new Date(),
-                updated_at: new Date()
+                updated_at: new Date(),
+                // Add user ID if logged in via Firebase
+                user_id: user ? user.uid : null,
+                // Add admin flag if booking is made by admin
+                is_admin_booking: isAdmin
             };
 
             // Save booking to Firestore
@@ -321,6 +338,117 @@ window.addEventListener("click", (e) => {
     }
 });
 
+// User Authentication Management
+function updateNavigationForUser(isLoggedIn, isAdmin = false) {
+    const userAuthSection = document.getElementById('userAuthSection');
+    
+    if (!userAuthSection) return;
+
+    if (isLoggedIn) {
+        // User is logged in - show logout button
+        userAuthSection.innerHTML = `
+            <li>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </li>
+        `;
+
+        // Add admin link if user is admin
+        if (isAdmin) {
+            const adminLi = document.createElement('li');
+            adminLi.innerHTML = `<a href="/admin" style="color: var(--gold);">Admin</a>`;
+            userAuthSection.parentNode.insertBefore(adminLi, userAuthSection);
+        }
+
+        // Add logout event listener
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+    } else {
+        // User is not logged in - show login/signup
+        userAuthSection.innerHTML = `
+            <li><a href="/login">Login</a></li>
+        `;
+    }
+}
+
+// Handle logout
+async function handleLogout() {
+    try {
+        // Check if user is logged in via Firebase
+        const user = auth.currentUser;
+        if (user) {
+            await signOut(auth);
+        }
+        
+        // Clear admin session
+        sessionStorage.removeItem('adminUser');
+        sessionStorage.removeItem('userEmail');
+        
+        // Redirect to home page
+        window.location.href = '/';
+    } catch (error) {
+        console.error('Error during logout:', error);
+        // Still redirect even if there's an error
+        window.location.href = '/';
+    }
+}
+
+// Check user authentication status and update UI accordingly
+function updateBookingUI(isLoggedIn) {
+    const loginRequiredMessage = document.getElementById('loginRequiredMessage');
+    const bookingContainer = document.getElementById('bookingContainer');
+    
+    if (loginRequiredMessage && bookingContainer) {
+        if (isLoggedIn) {
+            // User is logged in - show booking form
+            loginRequiredMessage.style.display = 'none';
+            bookingContainer.style.display = 'grid';
+        } else {
+            // User is not logged in - show login required message
+            loginRequiredMessage.style.display = 'block';
+            bookingContainer.style.display = 'none';
+        }
+    }
+}
+
+// Check user authentication status
+function checkAuthStatus() {
+    // Check Firebase authentication
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in via Firebase
+            updateNavigationForUser(true, false);
+            updateBookingUI(true);
+            
+            // Pre-fill form with user data if available
+            if (user.email) {
+                const emailInput = document.getElementById('email');
+                if (emailInput) emailInput.value = user.email;
+            }
+        } else {
+            // Check if user is admin (using sessionStorage)
+            const isAdmin = sessionStorage.getItem('adminUser') === 'true';
+            if (isAdmin) {
+                updateNavigationForUser(true, true);
+                updateBookingUI(true);
+                
+                // Pre-fill form with admin email if available
+                const adminEmail = sessionStorage.getItem('userEmail');
+                if (adminEmail) {
+                    const emailInput = document.getElementById('email');
+                    if (emailInput) emailInput.value = adminEmail;
+                }
+            } else {
+                updateNavigationForUser(false, false);
+                updateBookingUI(false);
+            }
+        }
+    });
+}
+
 // Smooth Scrolling for Anchor Links
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener("click", function (e) {
@@ -351,4 +479,5 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 document.addEventListener("DOMContentLoaded", function() {
     displaySelectedServices();
     updateBookingSummary();
+    checkAuthStatus();
 });

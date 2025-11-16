@@ -92,6 +92,21 @@
         font-size: 14px;
       }
 
+      .btn-logout {
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .btn-logout:hover {
+        background: #c82333;
+      }
+
       /* Header & Navigation */
       header {
         position: fixed;
@@ -134,6 +149,7 @@
       .nav-links {
         display: flex;
         list-style: none;
+        align-items: center;
       }
 
       .nav-links li {
@@ -454,6 +470,35 @@
         font-style: italic;
       }
 
+      /* Login Required Message */
+      .login-required {
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .login-required-icon {
+        font-size: 60px;
+        color: var(--emerald);
+        margin-bottom: 20px;
+      }
+
+      .login-required h3 {
+        color: var(--emerald);
+        margin-bottom: 15px;
+        font-size: 1.8rem;
+      }
+
+      .login-required p {
+        color: var(--gray);
+        margin-bottom: 25px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
       /* Footer */
       footer {
         background: var(--dark);
@@ -684,7 +729,10 @@
             <li><a href="/#gallery">Gallery</a></li>
             <li><a href="/#team">Our Team</a></li>
             <li><a href="/#contact">Contact</a></li>
-            <li><a href="/admin" style="color: var(--gold);">Admin</a></li>
+            <!-- Admin link will be dynamically added if user is admin -->
+            <li id="userAuthSection">
+              <!-- User authentication section will be populated by JavaScript -->
+            </li>
           </ul>
           <button class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
@@ -714,7 +762,21 @@
           </p>
         </div>
 
-        <div class="booking-container">
+        <!-- Login Required Message (Initially Hidden) -->
+        <div class="login-required" id="loginRequiredMessage" style="display: none;">
+          <div class="login-required-icon">
+            <i class="fas fa-user-lock"></i>
+          </div>
+          <h3>Login Required</h3>
+          <p>You need to be logged in to book an appointment. Please log in or create an account to continue with your booking.</p>
+          <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="/login" class="btn btn-gold">Login to Your Account</a>
+            <a href="/signup" class="btn">Create New Account</a>
+          </div>
+        </div>
+
+        <!-- Booking Form (Initially Hidden) -->
+        <div class="booking-container" id="bookingContainer">
           <div class="booking-form">
             <!-- Selected Services from Local Storage -->
             <div class="selected-services" id="selectedServicesContainer">
