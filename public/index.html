@@ -496,6 +496,10 @@
         margin-bottom: 5px;
       }
 
+      .contact-details p {
+        color: var(--gray);
+      }
+
       .map-container {
         height: 300px;
         border-radius: 8px;
@@ -613,67 +617,67 @@
         font-size: 14px;
       }
 
-        /* User Dropdown Styles */
-  .user-dropdown {
-      position: relative;
-      display: inline-block;
-  }
+      /* User Dropdown Styles */
+      .user-dropdown {
+          position: relative;
+          display: inline-block;
+      }
 
-  .user-btn {
-      background: none;
-      border: 2px solid var(--light-gray);
-      border-radius: 25px;
-      padding: 8px 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Raleway', sans-serif;
-      font-size: 14px;
-      color: var(--dark);
-      transition: all 0.3s ease;
-  }
+      .user-btn {
+          background: none;
+          border: 2px solid var(--light-gray);
+          border-radius: 25px;
+          padding: 8px 15px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-family: 'Raleway', sans-serif;
+          font-size: 14px;
+          color: var(--dark);
+          transition: all 0.3s ease;
+      }
 
-  .user-btn:hover {
-      border-color: var(--emerald);
-      background: rgba(255, 182, 193, 0.1);
-  }
+      .user-btn:hover {
+          border-color: var(--emerald);
+          background: rgba(255, 182, 193, 0.1);
+      }
 
-  .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 100%;
-      background: white;
-      min-width: 180px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      border-radius: 8px;
-      z-index: 1000;
-      margin-top: 10px;
-      overflow: hidden;
-  }
+      .dropdown-content {
+          display: none;
+          position: absolute;
+          right: 0;
+          top: 100%;
+          background: white;
+          min-width: 180px;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          border-radius: 8px;
+          z-index: 1000;
+          margin-top: 10px;
+          overflow: hidden;
+      }
 
-  .dropdown-content a {
-      display: block;
-      padding: 12px 16px;
-      text-decoration: none;
-      color: var(--dark);
-      border-bottom: 1px solid var(--light-gray);
-      transition: all 0.3s ease;
-  }
+      .dropdown-content a {
+          display: block;
+          padding: 12px 16px;
+          text-decoration: none;
+          color: var(--dark);
+          border-bottom: 1px solid var(--light-gray);
+          transition: all 0.3s ease;
+      }
 
-  .dropdown-content a:hover {
-      background: var(--emerald);
-      color: white;
-  }
+      .dropdown-content a:hover {
+          background: var(--emerald);
+          color: white;
+      }
 
-  .dropdown-content a:last-child {
-      border-bottom: none;
-  }
+      .dropdown-content a:last-child {
+          border-bottom: none;
+      }
 
-  .user-dropdown:hover .dropdown-content {
-      display: block;
-  }
+      .user-dropdown:hover .dropdown-content {
+          display: block;
+      }
 
       /* Responsive Design */
       @media (max-width: 992px) {
@@ -758,49 +762,46 @@
   </head>
   <body>
     <!-- Header & Navigation -->
-    <!-- In index.html, update the navigation section -->
-<header id="header">
-    <div class="container">
+    <header id="header">
+      <div class="container">
         <nav class="navbar">
-            <a href="/" class="logo">
-                <i class="fas fa-spa"></i>
-                Regel Glit Glam
-            </a>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="/services">Services</a></li>
-                <li><a href="/booking">Book Now</a></li>
-                <li><a href="#gallery">Gallery</a></li>
-                <li><a href="#team">Our Team</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="/admin" style="color: var(--gold);">Admin</a></li>
-                <!-- Add auth buttons -->
-                <li id="auth-buttons">
-                    <a href="/login" class="btn btn-small" id="login-btn">Sign In</a>
-                    <a href="/register" class="btn btn-small btn-gold" id="register-btn" style="margin-left: 10px;">Sign Up</a>
-                </li>
-                <li id="user-menu" style="display: none;">
-                    <div class="user-dropdown">
-                        <button class="user-btn" id="user-btn">
-                            <i class="fas fa-user-circle"></i>
-                            <span id="user-name">User</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="/profile">My Profile</a>
-                            <a href="/bookings">My Bookings</a>
-                            <a href="#" id="logout-btn">Logout</a>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <button class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
+          <a href="/" class="logo">
+            <i class="fas fa-spa"></i>
+            Regel Glit Glam
+          </a>
+          <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="/services">Services</a></li>
+            <li><a href="/booking">Book Now</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#team">Our Team</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <!-- Only show login button for non-authenticated users -->
+            <li id="auth-buttons">
+              <a href="/login" class="btn btn-small" id="login-btn">Sign In</a>
+            </li>
+            <!-- User menu for authenticated users (hidden by default) -->
+            <li id="user-menu" style="display: none;">
+              <div class="user-dropdown">
+                <button class="user-btn" id="user-btn">
+                  <i class="fas fa-user-circle"></i>
+                  <span id="user-name">User</span>
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-content">
+                  <a href="/profile">My Profile</a>
+                  <a href="/bookings">My Bookings</a>
+                  <a href="#" id="logout-btn">Logout</a>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <button class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+          </button>
         </nav>
-    </div>
-</header>
-    
+      </div>
+    </header>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -1210,115 +1211,66 @@
       import { 
         getAuth, 
         onAuthStateChanged, 
-        signOut,
-        updateProfile 
+        signOut
       } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const firebaseConfig = {
-    apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
-    authDomain: "gegel-glit-glam.firebaseapp.com",
-    projectId: "gegel-glit-glam",
-    storageBucket: "gegel-glit-glam.firebasestorage.app",
-    messagingSenderId: "105374344569",
-    appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
-  };
+      const firebaseConfig = {
+        apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
+        authDomain: "gegel-glit-glam.firebaseapp.com",
+        projectId: "gegel-glit-glam",
+        storageBucket: "gegel-glit-glam.firebasestorage.app",
+        messagingSenderId: "105374344569",
+        appId: "1:105374344569:web:0ce7b1c9d5f2050eed7ba8"
+      };
 
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       const auth = getAuth(app);
 
-    
-    // Auth state observer
-    onAuthStateChanged(auth, async (user) => {
+      // Auth state observer
+      onAuthStateChanged(auth, async (user) => {
         const authButtons = document.getElementById('auth-buttons');
         const userMenu = document.getElementById('user-menu');
         const userName = document.getElementById('user-name');
         
         if (user) {
-            // User is signed in
-            authButtons.style.display = 'none';
-            userMenu.style.display = 'block';
-            
-            // Get user data from Firestore
-            try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    userName.textContent = userData.firstName || user.displayName || 'User';
-                } else {
-                    userName.textContent = user.displayName || 'User';
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                userName.textContent = user.displayName || 'User';
+          // User is signed in
+          authButtons.style.display = 'none';
+          userMenu.style.display = 'block';
+          
+          // Get user data from Firestore
+          try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              userName.textContent = userData.firstName || user.displayName || 'User';
+            } else {
+              userName.textContent = user.displayName || 'User';
             }
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+            userName.textContent = user.displayName || 'User';
+          }
         } else {
-            // User is signed out
-            authButtons.style.display = 'block';
-            userMenu.style.display = 'none';
+          // User is signed out
+          authButtons.style.display = 'block';
+          userMenu.style.display = 'none';
         }
-    });
+      });
 
-    // Logout functionality
-    document.addEventListener('click', function(e) {
+      // Logout functionality
+      document.addEventListener('click', function(e) {
         if (e.target.id === 'logout-btn') {
-            e.preventDefault();
-            signOut(auth).then(() => {
-                showNotification('Logged out successfully!', 'success');
-            }).catch((error) => {
-                console.error('Logout error:', error);
-                showNotification('Logout failed. Please try again.', 'error');
-            });
+          e.preventDefault();
+          signOut(auth).then(() => {
+            showNotification('Logged out successfully!', 'success');
+          }).catch((error) => {
+            console.error('Logout error:', error);
+            showNotification('Logout failed. Please try again.', 'error');
+          });
         }
-    });
-
-    // Notification function (add this if not exists)
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: ${type === 'success' ? 'var(--emerald)' : '#dc3545'};
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 1001;
-            max-width: 300px;
-            animation: slideIn 0.3s ease;
-        `;
-        notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="margin-right: 8px;"></i>
-            ${message}
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
-    }
-
-    // Add CSS animations for notifications
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(400px); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
+      });
 
       // Mobile Menu Toggle
       const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
@@ -1339,113 +1291,6 @@
         } else {
           header.classList.remove("header-scrolled");
         }
-      });
-
-      // Function to check if user is authenticated
-      function checkAuth() {
-        return new Promise((resolve) => {
-          const user = JSON.parse(localStorage.getItem('regelUser'));
-          if (user && user.uid) {
-            currentUser = user;
-            userRole = user.role;
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        });
-      }
-
-      // Function to update navigation based on auth state
-      function updateNavigation() {
-        const navLinks = document.querySelector('.nav-links');
-        if (!navLinks) return;
-
-        // Remove existing auth buttons and user menu
-        const loginBtn = navLinks.querySelector('a[href="/login"]');
-        const signupBtn = navLinks.querySelector('a[href="/register"]');
-        const userMenu = navLinks.querySelector('.user-menu');
-        
-        if (loginBtn) loginBtn.parentElement.remove();
-        if (signupBtn) signupBtn.parentElement.remove();
-        if (userMenu) userMenu.remove();
-
-        if (currentUser) {
-          // User is logged in - show user menu
-          const userItem = document.createElement('li');
-          userItem.className = 'user-menu';
-          userItem.innerHTML = `
-            <a href="#" class="user-profile">
-              <i class="fas fa-user-circle"></i>
-              ${currentUser.displayName || 'User'}
-            </a>
-            <div class="dropdown-menu">
-              ${userRole === 'admin' ? '<a href="/admin"><i class="fas fa-cog"></i> Admin Dashboard</a>' : ''}
-              <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-          `;
-          navLinks.appendChild(userItem);
-
-          // Add logout functionality
-          document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-        } else {
-          // User is not logged in - show login/signup buttons
-          const loginItem = document.createElement('li');
-          loginItem.innerHTML = '<a href="/login" class="btn btn-small">Sign In</a>';
-          navLinks.appendChild(loginItem);
-        }
-      }
-
-      // Logout handler
-      async function handleLogout(e) {
-        e.preventDefault();
-        try {
-          await signOut(auth);
-          localStorage.removeItem('regelUser');
-          currentUser = null;
-          userRole = null;
-          updateNavigation();
-          window.location.href = '/';
-        } catch (error) {
-          console.error('Logout error:', error);
-          showNotification('Logout failed. Please try again.', 'error');
-        }
-      }
-
-      // Check authentication state
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          // Get user data from Firestore
-          try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-              currentUser = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                role: userData.role || 'customer'
-              };
-              userRole = currentUser.role;
-              
-              // Store in localStorage for persistence
-              localStorage.setItem('regelUser', JSON.stringify(currentUser));
-            }
-          } catch (error) {
-            console.error('Error getting user data:', error);
-          }
-        } else {
-          currentUser = null;
-          userRole = null;
-          localStorage.removeItem('regelUser');
-        }
-        updateNavigation();
-      });
-
-      // Initialize navigation on page load
-      document.addEventListener('DOMContentLoaded', () => {
-        checkAuth().then(() => {
-          updateNavigation();
-        });
       });
 
       // Smooth Scrolling for Anchor Links
@@ -1541,46 +1386,6 @@
         }
       `;
       document.head.appendChild(style);
-
-      // Setup admin user function (run this once to create admin user)
-      async function setupAdminUser() {
-        try {
-          const { createUserWithEmailAndPassword, updateProfile } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
-          const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-          
-          // Create admin user
-          const userCredential = await createUserWithEmailAndPassword(auth, AUTH_CONFIG.adminEmail, AUTH_CONFIG.adminPassword);
-          const user = userCredential.user;
-          
-          // Update profile
-          await updateProfile(user, {
-            displayName: 'Regel Glit Glam Admin'
-          });
-          
-          // Save to Firestore as admin
-          await setDoc(doc(db, 'users', user.uid), {
-            firstName: 'Regel Glit Glam',
-            lastName: 'Admin',
-            email: AUTH_CONFIG.adminEmail,
-            createdAt: new Date(),
-            role: 'admin'
-          });
-          
-          console.log('Admin user created successfully!');
-          showNotification('Admin user created successfully!', 'success');
-        } catch (error) {
-          if (error.code === 'auth/email-already-in-use') {
-            console.log('Admin user already exists');
-            showNotification('Admin user already exists', 'info');
-          } else {
-            console.error('Error creating admin user:', error);
-            showNotification('Error creating admin user: ' + error.message, 'error');
-          }
-        }
-      }
-
-      // Uncomment the line below and run it once in browser console to create the admin user
-      setupAdminUser();
     </script>
   </body>
 </html>
