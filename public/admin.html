@@ -1053,8 +1053,16 @@
                 
                 querySnapshot.forEach((doc) => {
                     const booking = doc.data();
-                    const bookingDate = booking.booking_date ? new Date(booking.booking_date.seconds * 1000).toLocaleDateString() : 'N/A';
-                    const servicesCount = booking.service_ids ? booking.service_ids.length : 0;
+                    // Handle both string dates and Firestore Timestamps
+                    let bookingDate = 'N/A';
+                    if (booking.booking_date) {
+                        if (typeof booking.booking_date === 'string') {
+                            bookingDate = new Date(booking.booking_date).toLocaleDateString();
+                        } else if (booking.booking_date.seconds) {
+                            bookingDate = new Date(booking.booking_date.seconds * 1000).toLocaleDateString();
+                        }
+                    }
+                    const servicesCount = booking.services ? booking.services.length : 0;
                     
                     const row = `
                         <tr>
@@ -1165,7 +1173,15 @@
                         }
                         customers[email].totalBookings++;
                         
-                        const bookingDate = booking.booking_date ? new Date(booking.booking_date.seconds * 1000) : new Date();
+                        // Handle both string dates and Firestore Timestamps
+                        let bookingDate = new Date();
+                        if (booking.booking_date) {
+                            if (typeof booking.booking_date === 'string') {
+                                bookingDate = new Date(booking.booking_date);
+                            } else if (booking.booking_date.seconds) {
+                                bookingDate = new Date(booking.booking_date.seconds * 1000);
+                            }
+                        }
                         if (!customers[email].lastVisit || bookingDate > customers[email].lastVisit) {
                             customers[email].lastVisit = bookingDate;
                         }
@@ -1286,7 +1302,15 @@
                 let historyMessage = `Booking history for ${customerEmail}:\n\n`;
                 querySnapshot.forEach(doc => {
                     const booking = doc.data();
-                    const date = booking.booking_date ? new Date(booking.booking_date.seconds * 1000).toLocaleDateString() : 'N/A';
+                    // Handle both string dates and Firestore Timestamps
+                    let date = 'N/A';
+                    if (booking.booking_date) {
+                        if (typeof booking.booking_date === 'string') {
+                            date = new Date(booking.booking_date).toLocaleDateString();
+                        } else if (booking.booking_date.seconds) {
+                            date = new Date(booking.booking_date.seconds * 1000).toLocaleDateString();
+                        }
+                    }
                     historyMessage += `• ${date} - ${booking.booking_time || 'N/A'} - ${booking.status || 'Pending'} - GHS ${booking.total_price || 0}\n`;
                 });
                 
