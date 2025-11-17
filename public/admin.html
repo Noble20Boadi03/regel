@@ -1070,7 +1070,10 @@
                 const filterSelect = document.getElementById('booking-filter');
                 const filterValue = filterSelect ? filterSelect.value : 'active';
                 
+                console.log('Selected filter:', filterValue); // Debug log
+                
                 let displayedCount = 0;
+                let autoUpdateNeeded = false;
                 
                 querySnapshot.forEach((doc) => {
                     const booking = doc.data();
@@ -1088,39 +1091,42 @@
                         }
                     }
                     
-                    // Auto-archive past bookings that are still pending
+                    // Check if this booking needs auto-update (but don't do it yet)
                     if (bookingDateObj && bookingDateObj < today && booking.status === 'Pending') {
-                        // Automatically update to Completed
-                        updateBookingStatus(doc.id, 'Completed', true);
-                        return; // Skip this booking in current render, will reload
+                        autoUpdateNeeded = true;
+                        // We'll update after displaying current data
                     }
                     
                     // Apply filter
                     const status = (booking.status || 'Pending').toLowerCase();
+                    console.log('Booking status:', status, 'Filter:', filterValue); // Debug log
+                    
                     let shouldDisplay = false;
                     
                     switch(filterValue) {
                         case 'active':
-                            shouldDisplay = status === 'pending' || status === 'confirmed';
+                            shouldDisplay = (status === 'pending' || status === 'confirmed');
                             break;
                         case 'all':
                             shouldDisplay = true;
                             break;
                         case 'pending':
-                            shouldDisplay = status === 'pending';
+                            shouldDisplay = (status === 'pending');
                             break;
                         case 'confirmed':
-                            shouldDisplay = status === 'confirmed';
+                            shouldDisplay = (status === 'confirmed');
                             break;
                         case 'completed':
-                            shouldDisplay = status === 'completed';
+                            shouldDisplay = (status === 'completed');
                             break;
                         case 'cancelled':
-                            shouldDisplay = status === 'cancelled';
+                            shouldDisplay = (status === 'cancelled');
                             break;
                         default:
                             shouldDisplay = true;
                     }
+                    
+                    console.log('Should display:', shouldDisplay); // Debug log
                     
                     if (!shouldDisplay) {
                         return;
@@ -1163,9 +1169,32 @@
                     tbody.innerHTML += row;
                 });
                 
+                console.log('Displayed count:', displayedCount); // Debug log
+                
                 // Show message if filter returned no results
                 if (displayedCount === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No bookings match the selected filter</td></tr>';
+                }
+                
+                // Auto-update past pending bookings after display
+                if (autoUpdateNeeded) {
+                    console.log('Auto-updating past bookings...');
+                    setTimeout(() => {
+                        querySnapshot.forEach(async (doc) => {
+                            const booking = doc.data();
+                            let bookingDateObj = null;
+                            if (booking.booking_date) {
+                                if (typeof booking.booking_date === 'string') {
+                                    bookingDateObj = new Date(booking.booking_date);
+                                } else if (booking.booking_date.seconds) {
+                                    bookingDateObj = new Date(booking.booking_date.seconds * 1000);
+                                }
+                            }
+                            if (bookingDateObj && bookingDateObj < today && booking.status === 'Pending') {
+                                await updateBookingStatus(doc.id, 'Completed', true);
+                            }
+                        });
+                    }, 100);
                 }
                 
             } catch (error) {
