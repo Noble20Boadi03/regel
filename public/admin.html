@@ -701,7 +701,7 @@
                     
                     <div style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
                         <label style="margin-right: 10px; font-weight: 500;">Filter:</label>
-                        <select id="booking-filter" onchange="loadBookings()" style="padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; font-size: 14px;">
+                        <select id="booking-filter" style="padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; font-size: 14px;">
                             <option value="active">Active Bookings (Pending & Confirmed)</option>
                             <option value="all">All Bookings</option>
                             <option value="pending">Pending Only</option>
@@ -932,6 +932,14 @@
             loadBookings();
             loadServices();
             loadCustomers();
+            
+            // Setup booking filter event listener
+            const bookingFilter = document.getElementById('booking-filter');
+            if (bookingFilter) {
+                bookingFilter.addEventListener('change', function() {
+                    loadBookings();
+                });
+            }
 
             // Setup logout functionality
             document.getElementById('admin-logout').addEventListener('click', function(e) {
