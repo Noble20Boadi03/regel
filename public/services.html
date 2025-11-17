@@ -1122,22 +1122,21 @@
             const categoriesQuery = query(collection(db, 'service_categories'), orderBy('category_name'));
             const categoriesSnapshot = await getDocs(categoriesQuery);
             
-            // Only load active services
-            const servicesQuery = query(
-                collection(db, 'services'), 
-                where('is_active', '==', true),
-                orderBy('service_name')
-            );
+            // Load all services first, then filter active ones in code
+            const servicesQuery = query(collection(db, 'services'));
             const servicesSnapshot = await getDocs(servicesQuery);
             
             const servicesByCategory = {};
             
             servicesSnapshot.forEach(doc => {
                 const service = { id: doc.id, ...doc.data() };
-                if (!servicesByCategory[service.category_id]) {
-                    servicesByCategory[service.category_id] = [];
+                // Only include active services
+                if (service.is_active === true) {
+                    if (!servicesByCategory[service.category_id]) {
+                        servicesByCategory[service.category_id] = [];
+                    }
+                    servicesByCategory[service.category_id].push(service);
                 }
-                servicesByCategory[service.category_id].push(service);
             });
             
             renderServices(categoriesSnapshot, servicesByCategory);
