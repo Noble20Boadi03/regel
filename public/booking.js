@@ -294,9 +294,9 @@ if (bookingForm) {
             // Save booking to Firestore
             const docRef = await addDoc(collection(db, 'bookings'), bookingData);
             
-            // Send email receipt to customer
+            // Send email receipt to customer using mailto
             try {
-                await sendBookingReceipt({
+                sendBookingReceipt({
                     bookingId: docRef.id,
                     customerName: `${firstName} ${lastName}`,
                     customerEmail: email,
@@ -533,39 +533,54 @@ function closeAuthModal() {
     }
 }
 
-// Send booking receipt via email
-async function sendBookingReceipt(bookingDetails) {
-    // Initialize EmailJS (you'll need to replace these with your actual EmailJS credentials)
-    // Sign up at https://www.emailjs.com/ and get your public key
-    emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS public key
+// Send booking receipt via mailto link
+function sendBookingReceipt(bookingDetails) {
+    const subject = `Booking Confirmation - Regel Glit Glam - ${bookingDetails.bookingId}`;
     
-    const templateParams = {
-        to_email: bookingDetails.customerEmail,
-        to_name: bookingDetails.customerName,
-        booking_id: bookingDetails.bookingId,
-        services: bookingDetails.services,
-        booking_date: bookingDetails.date,
-        booking_time: bookingDetails.time,
-        total_price: `GHS ${bookingDetails.total.toFixed(2)}`,
-        phone: bookingDetails.phone,
-        salon_name: "Regel Glit Glam",
-        salon_phone: "0556548737",
-        salon_email: "info@regelglitglam.com"
-    };
+    const body = `Dear ${bookingDetails.customerName},
+
+Thank you for choosing Regel Glit Glam! Your booking has been confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BOOKING DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Booking ID: ${bookingDetails.bookingId}
+Services: ${bookingDetails.services}
+Date: ${bookingDetails.date}
+Time: ${bookingDetails.time}
+Total: GHS ${bookingDetails.total.toFixed(2)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Please arrive 10 minutes before your appointment
+• Bring this confirmation email or booking ID
+• Contact us if you need to reschedule
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT US
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Phone: 0556548737
+Email: info@regelglitglam.com
+
+We look forward to pampering you!
+
+Best regards,
+Regel Glit Glam Team
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+© 2024 Regel Glit Glam. All rights reserved.`;
+
+    // Create mailto link
+    const mailtoLink = `mailto:${bookingDetails.customerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=info@regelglitglam.com`;
     
-    try {
-        // Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual EmailJS IDs
-        const response = await emailjs.send(
-            'YOUR_SERVICE_ID',      // Replace with your EmailJS service ID
-            'YOUR_TEMPLATE_ID',     // Replace with your EmailJS template ID
-            templateParams
-        );
-        console.log('Email sent successfully:', response);
-        return response;
-    } catch (error) {
-        console.error('Email sending failed:', error);
-        throw error;
-    }
+    // Open mail client
+    window.open(mailtoLink, '_blank');
+    
+    console.log('Email receipt prepared for:', bookingDetails.customerEmail);
 }
 
 // Initialize the page
