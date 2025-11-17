@@ -602,7 +602,7 @@
                             <label for="password">Password</label>
                             <div class="password-input">
                                 <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
-                                <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                <button type="button" class="toggle-password" data-target="password">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
@@ -744,19 +744,22 @@
             }
         });
 
-        // Toggle Password Visibility
-        function togglePassword(inputId) {
-            const passwordInput = document.getElementById(inputId);
-            const toggleIcon = passwordInput.nextElementSibling.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.className = 'fas fa-eye';
-            }
-        }
+        // Toggle Password Visibility via Event Listeners
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const toggleIcon = button.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.className = 'fas fa-eye-slash';
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.className = 'fas fa-eye';
+                }
+            });
+        });
 
         // Login Form Submission
         const loginForm = document.getElementById('loginForm');
