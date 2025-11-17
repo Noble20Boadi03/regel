@@ -294,6 +294,23 @@ if (bookingForm) {
             // Save booking to Firestore
             const docRef = await addDoc(collection(db, 'bookings'), bookingData);
             
+            // Send email receipt to customer
+            try {
+                await sendBookingReceipt({
+                    bookingId: docRef.id,
+                    customerName: `${firstName} ${lastName}`,
+                    customerEmail: email,
+                    services: serviceNames,
+                    date: formattedDate,
+                    time: displayTime,
+                    total: totalPrice,
+                    phone: phone
+                });
+            } catch (emailError) {
+                console.error('Error sending email:', emailError);
+                // Don't fail the booking if email fails
+            }
+            
             // Update confirmation modal with booking details
             document.getElementById('confirm-booking-id').textContent = docRef.id;
             document.getElementById('confirm-services').textContent = serviceNames;
@@ -513,6 +530,41 @@ function closeAuthModal() {
     const modal = document.getElementById('authModal');
     if (modal) {
         modal.remove();
+    }
+}
+
+// Send booking receipt via email
+async function sendBookingReceipt(bookingDetails) {
+    // Initialize EmailJS (you'll need to replace these with your actual EmailJS credentials)
+    // Sign up at https://www.emailjs.com/ and get your public key
+    emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS public key
+    
+    const templateParams = {
+        to_email: bookingDetails.customerEmail,
+        to_name: bookingDetails.customerName,
+        booking_id: bookingDetails.bookingId,
+        services: bookingDetails.services,
+        booking_date: bookingDetails.date,
+        booking_time: bookingDetails.time,
+        total_price: `GHS ${bookingDetails.total.toFixed(2)}`,
+        phone: bookingDetails.phone,
+        salon_name: "Regel Glit Glam",
+        salon_phone: "0556548737",
+        salon_email: "info@regelglitglam.com"
+    };
+    
+    try {
+        // Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual EmailJS IDs
+        const response = await emailjs.send(
+            'YOUR_SERVICE_ID',      // Replace with your EmailJS service ID
+            'YOUR_TEMPLATE_ID',     // Replace with your EmailJS template ID
+            templateParams
+        );
+        console.log('Email sent successfully:', response);
+        return response;
+    } catch (error) {
+        console.error('Email sending failed:', error);
+        throw error;
     }
 }
 
