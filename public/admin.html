@@ -699,6 +699,18 @@
                         <p>View and update booking statuses</p>
                     </div>
                     
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                        <label style="margin-right: 10px; font-weight: 500;">Filter:</label>
+                        <select id="booking-filter" onchange="loadBookings()" style="padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; font-size: 14px;">
+                            <option value="active">Active Bookings (Pending & Confirmed)</option>
+                            <option value="all">All Bookings</option>
+                            <option value="pending">Pending Only</option>
+                            <option value="confirmed">Confirmed Only</option>
+                            <option value="completed">Completed Only</option>
+                            <option value="cancelled">Cancelled Only</option>
+                        </select>
+                    </div>
+                    
                     <div class="table-container">
                         <table>
                             <thead>
@@ -1051,17 +1063,71 @@
                     return;
                 }
                 
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time to start of day
+                
+                // Get selected filter
+                const filterSelect = document.getElementById('booking-filter');
+                const filterValue = filterSelect ? filterSelect.value : 'active';
+                
+                let displayedCount = 0;
+                
                 querySnapshot.forEach((doc) => {
                     const booking = doc.data();
+                    
                     // Handle both string dates and Firestore Timestamps
+                    let bookingDateObj = null;
                     let bookingDate = 'N/A';
                     if (booking.booking_date) {
                         if (typeof booking.booking_date === 'string') {
-                            bookingDate = new Date(booking.booking_date).toLocaleDateString();
+                            bookingDateObj = new Date(booking.booking_date);
+                            bookingDate = bookingDateObj.toLocaleDateString();
                         } else if (booking.booking_date.seconds) {
-                            bookingDate = new Date(booking.booking_date.seconds * 1000).toLocaleDateString();
+                            bookingDateObj = new Date(booking.booking_date.seconds * 1000);
+                            bookingDate = bookingDateObj.toLocaleDateString();
                         }
                     }
+                    
+                    // Auto-archive past bookings that are still pending
+                    if (bookingDateObj && bookingDateObj < today && booking.status === 'Pending') {
+                        // Automatically update to Completed
+                        updateBookingStatus(doc.id, 'Completed', true);
+                        return; // Skip this booking in current render, will reload
+                    }
+                    
+                    // Apply filter
+                    const status = (booking.status || 'Pending').toLowerCase();
+                    let shouldDisplay = false;
+                    
+                    switch(filterValue) {
+                        case 'active':
+                            shouldDisplay = status === 'pending' || status === 'confirmed';
+                            break;
+                        case 'all':
+                            shouldDisplay = true;
+                            break;
+                        case 'pending':
+                            shouldDisplay = status === 'pending';
+                            break;
+                        case 'confirmed':
+                            shouldDisplay = status === 'confirmed';
+                            break;
+                        case 'completed':
+                            shouldDisplay = status === 'completed';
+                            break;
+                        case 'cancelled':
+                            shouldDisplay = status === 'cancelled';
+                            break;
+                        default:
+                            shouldDisplay = true;
+                    }
+                    
+                    if (!shouldDisplay) {
+                        return;
+                    }
+                    
+                    displayedCount++;
+                    
                     const servicesCount = booking.services ? booking.services.length : 0;
                     
                     const row = `
@@ -1096,6 +1162,11 @@
                     `;
                     tbody.innerHTML += row;
                 });
+                
+                // Show message if filter returned no results
+                if (displayedCount === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No bookings match the selected filter</td></tr>';
+                }
                 
             } catch (error) {
                 console.error('Error loading bookings:', error);
@@ -1222,18 +1293,23 @@
         }
 
         // Update Booking Status
-        window.updateBookingStatus = async function(bookingId, newStatus) {
+        window.updateBookingStatus = async function(bookingId, newStatus, silent = false) {
             try {
                 const bookingRef = doc(db, 'bookings', bookingId);
                 await updateDoc(bookingRef, {
-                    status: newStatus
+                    status: newStatus,
+                    updated_at: new Date()
                 });
-                alert('Booking status updated successfully!');
+                if (!silent) {
+                    alert('Booking status updated successfully!');
+                }
                 loadBookings();
                 loadStatistics();
             } catch (error) {
                 console.error('Error updating booking status:', error);
-                alert('Error updating booking status');
+                if (!silent) {
+                    alert('Error updating booking status');
+                }
             }
         };
 
