@@ -881,7 +881,7 @@
     <script type="module">
     // Firestore Integration - CLEAN SINGLE VERSION
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
@@ -1122,7 +1122,12 @@
             const categoriesQuery = query(collection(db, 'service_categories'), orderBy('category_name'));
             const categoriesSnapshot = await getDocs(categoriesQuery);
             
-            const servicesQuery = query(collection(db, 'services'), orderBy('service_name'));
+            // Only load active services
+            const servicesQuery = query(
+                collection(db, 'services'), 
+                where('is_active', '==', true),
+                orderBy('service_name')
+            );
             const servicesSnapshot = await getDocs(servicesQuery);
             
             const servicesByCategory = {};
