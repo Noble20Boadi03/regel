@@ -1,6 +1,14 @@
 // booking.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    doc, 
+    getDoc, 
+    getDocs, 
+    query 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { 
     getAuth, 
     onAuthStateChanged,
@@ -48,29 +56,112 @@ const dateInput = document.getElementById("date");
 if (dateInput) {
     const today = new Date().toISOString().split("T")[0];
     dateInput.min = today;
+    
+    // Check for booked slots when date changes
+    dateInput.addEventListener("change", async () => {
+        await checkBookedSlots(dateInput.value);
+    });
 }
 
-// Time Slot Selection
-const timeSlots = document.querySelectorAll(".time-slot:not(.unavailable)");
-const selectedTimeInput = document.getElementById("selectedTime");
+// Function to check and disable already booked time slots
+async function checkBookedSlots(selectedDate) {
+    if (!selectedDate) return;
+    
+    try {
+        console.log('Checking booked slots for date:', selectedDate);
+        
+        // Get all bookings for the selected date
+        const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
+        const bookedTimes = new Set();
+        
+        bookingsSnapshot.forEach(doc => {
+            const booking = doc.data();
+            const bookingDate = booking.booking_date;
+            
+            // Convert booking date to string for comparison
+            let bookingDateStr = '';
+            if (typeof bookingDate === 'string') {
+                bookingDateStr = bookingDate;
+            } else if (bookingDate && bookingDate.toDate) {
+                bookingDateStr = bookingDate.toDate().toISOString().split('T')[0];
+            }
+            
+            // If booking is on the selected date and status is pending or confirmed
+            const status = (booking.status || '').toLowerCase();
+            if (bookingDateStr === selectedDate && (status === 'pending' || status === 'confirmed')) {
+                bookedTimes.add(booking.booking_time);
+                console.log('Booked slot found:', booking.booking_time, 'Status:', status);
+            }
+        });
+        
+        console.log(`Total booked slots for ${selectedDate}:`, Array.from(bookedTimes));
+        
+        // Update time slots UI
+        const allTimeSlots = document.querySelectorAll('.time-slot');
+        allTimeSlots.forEach(slot => {
+            const slotTime = slot.getAttribute('data-time');
+            
+            // Remove old event listeners and classes
+            slot.classList.remove('selected');
+            
+            if (bookedTimes.has(slotTime)) {
+                // Mark as unavailable
+                slot.classList.add('unavailable');
+                slot.style.cursor = 'not-allowed';
+                slot.style.opacity = '0.5';
+                slot.style.backgroundColor = '#f8d7da';
+                slot.title = 'This time slot is already booked';
+            } else {
+                // Mark as available
+                slot.classList.remove('unavailable');
+                slot.style.cursor = 'pointer';
+                slot.style.opacity = '1';
+                slot.style.backgroundColor = '';
+                slot.title = 'Click to select this time';
+            }
+        });
+        
+        // Re-attach click events to all time slots
+        attachTimeSlotEvents();
+        
+    } catch (error) {
+        console.error('Error checking booked slots:', error);
+    }
+}
 
-if (timeSlots.length > 0) {
-    timeSlots.forEach((slot) => {
-        slot.addEventListener("click", () => {
-            // Remove selected class from all time slots
-            timeSlots.forEach((s) => s.classList.remove("selected"));
-
-            // Add selected class to clicked slot
-            slot.classList.add("selected");
-
-            // Update hidden input value
-            selectedTimeInput.value = slot.getAttribute("data-time");
-
-            // Update booking summary
-            updateBookingSummary();
+// Function to attach click events to time slots
+function attachTimeSlotEvents() {
+    const allTimeSlots = document.querySelectorAll('.time-slot');
+    
+    allTimeSlots.forEach(slot => {
+        // Remove any existing listeners by cloning
+        const newSlot = slot.cloneNode(true);
+        slot.parentNode.replaceChild(newSlot, slot);
+        
+        // Add new event listener
+        newSlot.addEventListener('click', function() {
+            if (!this.classList.contains('unavailable')) {
+                // Remove selected class from all time slots
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                
+                // Add selected class to clicked slot
+                this.classList.add('selected');
+                
+                // Update hidden input value
+                selectedTimeInput.value = this.getAttribute('data-time');
+                
+                // Update booking summary
+                updateBookingSummary();
+            }
         });
     });
 }
+
+// Time Slot Selection - Initial setup
+const selectedTimeInput = document.getElementById("selectedTime");
+
+// Attach initial event listeners
+attachTimeSlotEvents();
 
 // Load selected services from localStorage
 let selectedServices = JSON.parse(localStorage.getItem("regelCart")) || [];
@@ -248,6 +339,36 @@ if (bookingForm) {
             const timeValue = selectedTimeInput.value;
             const specialRequests = document.getElementById('specialRequests').value;
 
+            // **DOUBLE-BOOKING CHECK** - Verify slot is still available
+            console.log('Checking for double-booking before submission...');
+            const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
+            let isSlotAvailable = true;
+            
+            bookingsSnapshot.forEach(doc => {
+                const booking = doc.data();
+                let bookingDateStr = '';
+                
+                if (typeof booking.booking_date === 'string') {
+                    bookingDateStr = booking.booking_date;
+                } else if (booking.booking_date && booking.booking_date.toDate) {
+                    bookingDateStr = booking.booking_date.toDate().toISOString().split('T')[0];
+                }
+                
+                const status = (booking.status || '').toLowerCase();
+                if (bookingDateStr === dateValue && 
+                    booking.booking_time === timeValue && 
+                    (status === 'pending' || status === 'confirmed')) {
+                    isSlotAvailable = false;
+                    console.log('Slot already booked:', booking);
+                }
+            });
+            
+            if (!isSlotAvailable) {
+                alert('Sorry, this time slot has just been booked by another customer. Please select a different time.');
+                await checkBookedSlots(dateValue); // Refresh available slots
+                return;
+            }
+
             // Format date for display
             const formattedDate = new Date(dateValue).toLocaleDateString("en-US", {
                 weekday: "long",
@@ -272,6 +393,10 @@ if (bookingForm) {
                     email: email,
                     phone: phone
                 },
+                // Add top-level fields for easier querying
+                email: email,
+                phone: phone,
+                full_name: `${firstName} ${lastName}`,
                 services: selectedServices.map(service => ({
                     id: service.id || service.service.toLowerCase().replace(/\s+/g, '-'),
                     name: service.service,
@@ -281,7 +406,7 @@ if (bookingForm) {
                 booking_date: dateValue,
                 booking_time: timeValue,
                 special_requests: specialRequests,
-                status: 'Pending',
+                status: 'pending',
                 total_price: totalPrice,
                 created_at: new Date(),
                 updated_at: new Date(),
@@ -292,7 +417,9 @@ if (bookingForm) {
             };
 
             // Save booking to Firestore
+            console.log('Attempting to save booking:', bookingData);
             const docRef = await addDoc(collection(db, 'bookings'), bookingData);
+            console.log('Booking saved successfully with ID:', docRef.id);
             
             // Send email receipt to customer using mailto
             try {
@@ -310,30 +437,63 @@ if (bookingForm) {
                 console.error('Error sending email:', emailError);
                 // Don't fail the booking if email fails
             }
-            
-            // Update confirmation modal with booking details
-            document.getElementById('confirm-booking-id').textContent = docRef.id;
-            document.getElementById('confirm-services').textContent = serviceNames;
-            document.getElementById('confirm-date').textContent = formattedDate;
-            document.getElementById('confirm-time').textContent = displayTime;
-            document.getElementById('confirm-total').textContent = `$${totalPrice.toFixed(2)}`;
 
-            // Show confirmation modal
-            confirmationModal.style.display = "flex";
+            // Update confirmation modal with booking details
+            try {
+                document.getElementById('confirm-booking-id').textContent = docRef.id;
+                document.getElementById('confirm-services').textContent = serviceNames;
+                document.getElementById('confirm-date').textContent = formattedDate;
+                document.getElementById('confirm-time').textContent = displayTime;
+                document.getElementById('confirm-total').textContent = `$${totalPrice.toFixed(2)}`;
+
+                // Show confirmation modal
+                confirmationModal.style.display = "flex";
+            } catch (modalError) {
+                console.error('Error showing modal:', modalError);
+                // Show alert instead if modal fails
+                alert(`Booking confirmed! Your booking ID is: ${docRef.id}`);
+            }
 
             // Clear localStorage and reset form
-            localStorage.removeItem("regelCart");
-            selectedServices = [];
-            displaySelectedServices();
-            bookingForm.reset();
-            if (timeSlots.length > 0) {
-                timeSlots.forEach((slot) => slot.classList.remove("selected"));
+            try {
+                localStorage.removeItem("regelCart");
+                selectedServices = [];
+                displaySelectedServices();
+                bookingForm.reset();
+                
+                // Clear selected time slots
+                const allTimeSlots = document.querySelectorAll('.time-slot');
+                if (allTimeSlots.length > 0) {
+                    allTimeSlots.forEach((slot) => slot.classList.remove("selected"));
+                }
+                
+                if (selectedTimeInput) {
+                    selectedTimeInput.value = '';
+                }
+                
+                updateBookingSummary();
+            } catch (cleanupError) {
+                console.error('Error during cleanup:', cleanupError);
+                // Don't show error to user for cleanup issues
             }
-            updateBookingSummary();
 
         } catch (error) {
             console.error('Error creating booking:', error);
-            alert('There was an error submitting your booking. Please try again.');
+            console.error('Error message:', error.message);
+            console.error('Error code:', error.code);
+            console.error('Error stack:', error.stack);
+            
+            // Only show error alert if booking actually failed (not if it's a cleanup/UI error after successful save)
+            // Check if error is from cleanup phase or actual booking failure
+            const isCleanupError = error.message && (
+                error.message.includes('timeSlots') || 
+                error.message.includes('modal') ||
+                error.message.includes('docRef')
+            );
+            
+            if (!isCleanupError) {
+                alert('There was an error submitting your booking. Please try again. Error: ' + error.message);
+            }
         }
     });
 }
@@ -357,37 +517,44 @@ window.addEventListener("click", (e) => {
 
 // User Authentication Management
 function updateNavigationForUser(isLoggedIn, isAdmin = false) {
-    const userAuthSection = document.getElementById('userAuthSection');
+    const userMenu = document.getElementById('user-menu');
+    const authButtons = document.getElementById('auth-buttons');
+    const userName = document.getElementById('user-name');
+    const adminLink = document.getElementById('admin-link');
     
-    if (!userAuthSection) return;
-
     if (isLoggedIn) {
-        // User is logged in - show logout button
-        userAuthSection.innerHTML = `
-            <li>
-                <button class="btn-logout" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </li>
-        `;
-
-        // Add admin link if user is admin
-        if (isAdmin) {
-            const adminLi = document.createElement('li');
-            adminLi.innerHTML = `<a href="/admin" style="color: var(--gold);">Admin</a>`;
-            userAuthSection.parentNode.insertBefore(adminLi, userAuthSection);
+        // User is signed in
+        if (authButtons) authButtons.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'block';
+        
+        // Set user name from auth or session
+        const user = auth.currentUser;
+        if (userName) {
+            if (user) {
+                userName.textContent = user.displayName || user.email.split('@')[0];
+            } else {
+                // Admin user from session storage
+                const adminEmail = sessionStorage.getItem('userEmail');
+                userName.textContent = adminEmail ? adminEmail.split('@')[0] : 'Admin';
+            }
         }
-
-        // Add logout event listener
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', handleLogout);
+        
+        // Show admin link if user is admin
+        if (isAdmin && adminLink) {
+            adminLink.style.display = 'block';
         }
     } else {
-        // User is not logged in - show login/signup
-        userAuthSection.innerHTML = `
-            <li><a href="/login">Login</a></li>
-        `;
+        // User is signed out
+        if (authButtons) authButtons.style.display = 'flex';
+        if (userMenu) userMenu.style.display = 'none';
+        if (adminLink) adminLink.style.display = 'none';
+    }
+    
+    // Add logout event listener
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn && !logoutBtn.hasAttribute('data-listener')) {
+        logoutBtn.setAttribute('data-listener', 'true');
+        logoutBtn.addEventListener('click', handleLogout);
     }
 }
 
@@ -432,12 +599,24 @@ function updateBookingUI(isLoggedIn) {
 }
 
 // Check user authentication status
-function checkAuthStatus() {
+async function checkAuthStatus() {
     // Check Firebase authentication
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             // User is signed in via Firebase
-            updateNavigationForUser(true, false);
+            let isAdmin = false;
+            
+            // Check if user is admin from Firestore
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists() && userDoc.data().role === 'admin') {
+                    isAdmin = true;
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+            }
+            
+            updateNavigationForUser(true, isAdmin);
             updateBookingUI(true);
             
             // Pre-fill form with user data if available

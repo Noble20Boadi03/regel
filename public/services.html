@@ -149,6 +149,92 @@
             color: var(--emerald);
         }
 
+        /* User Dropdown Menu */
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-menu {
+            display: none;
+            position: relative;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            background: var(--emerald);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .user-btn:hover {
+            background: var(--emerald-light);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 5px);
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1000;
+            margin-top: 0;
+            overflow: hidden;
+        }
+        
+        /* Create a bridge between button and dropdown */
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 100%;
+            height: 10px;
+            display: none;
+        }
+        
+        .user-dropdown:hover::before {
+            display: block;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--dark);
+            border-bottom: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--emerald);
+            color: white;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .user-dropdown:hover .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+        }
+
         /* Page Header */
         .page-header {
             background: linear-gradient(rgba(255, 182, 193, 0.8), rgba(255, 145, 164, 0.6)), url('https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80') no-repeat center center/cover;
@@ -689,6 +775,33 @@
                     <li><a href="/#team">Our Team</a></li>
                     <li><a href="/#contact">Contact</a></li>
                     
+                    <!-- Authentication buttons (shown when not logged in) -->
+                    <li class="auth-buttons" id="auth-buttons" style="display: none;">
+                        <a href="/login" class="btn btn-small">Sign In</a>
+                        <a href="/register" class="btn btn-small btn-gold">Sign Up</a>
+                    </li>
+                    
+                    <!-- User menu (shown when logged in) -->
+                    <li id="user-menu">
+                        <div class="user-dropdown">
+                            <button class="user-btn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="user-name">User</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="/admin.html" id="admin-link" style="display: none;">
+                                    <i class="fas fa-shield-alt"></i> Admin Panel
+                                </a>
+                                <a href="/my-bookings.html">
+                                    <i class="fas fa-calendar-check"></i> My Bookings
+                                </a>
+                                <a href="#" id="logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
                 <button class="mobile-menu-btn">
                     <i class="fas fa-bars"></i>
@@ -881,7 +994,8 @@
     <script type="module">
     // Firestore Integration - CLEAN SINGLE VERSION
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDAu9wfWgBwfPUB3-qFECrQxckNDwCdkKA",
@@ -895,6 +1009,7 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
     // Mobile Menu Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
@@ -1239,6 +1354,50 @@
     document.addEventListener('DOMContentLoaded', function() {
         updateCart();
         loadServices();
+        
+        // Check authentication state
+        onAuthStateChanged(auth, async (user) => {
+            const userMenu = document.getElementById('user-menu');
+            const authButtons = document.getElementById('auth-buttons');
+            const userName = document.getElementById('user-name');
+            const adminLink = document.getElementById('admin-link');
+            
+            if (user) {
+                // User is signed in
+                if (authButtons) authButtons.style.display = 'none';
+                if (userMenu) userMenu.style.display = 'block';
+                if (userName) userName.textContent = user.displayName || user.email.split('@')[0];
+                
+                // Check if user is admin
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists() && userDoc.data().role === 'admin') {
+                        if (adminLink) adminLink.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error checking admin status:', error);
+                }
+            } else {
+                // User is signed out
+                if (authButtons) authButtons.style.display = 'flex';
+                if (userMenu) userMenu.style.display = 'none';
+                if (adminLink) adminLink.style.display = 'none';
+            }
+        });
+        
+        // Logout functionality
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await signOut(auth);
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                }
+            });
+        }
 
         if (window.location.hash) {
             const targetId = window.location.hash.substring(1);

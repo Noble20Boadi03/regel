@@ -177,6 +177,92 @@
         color: var(--emerald);
       }
 
+      /* User Dropdown Menu */
+      .auth-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      #user-menu {
+        display: none;
+        position: relative;
+      }
+
+      .user-dropdown {
+        position: relative;
+      }
+
+      .user-btn {
+        background: var(--emerald);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .user-btn:hover {
+        background: var(--emerald-light);
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 5px);
+        background: white;
+        min-width: 180px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        z-index: 1000;
+        margin-top: 0;
+        overflow: hidden;
+      }
+      
+      /* Create a bridge between button and dropdown */
+      .user-dropdown::before {
+        content: '';
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 100%;
+        height: 10px;
+        display: none;
+      }
+      
+      .user-dropdown:hover::before {
+        display: block;
+      }
+
+      .dropdown-content a {
+        display: block;
+        padding: 12px 16px;
+        text-decoration: none;
+        color: var(--dark);
+        border-bottom: 1px solid var(--light-gray);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .dropdown-content a:hover {
+        background: var(--emerald);
+        color: white;
+      }
+
+      .dropdown-content a:last-child {
+        border-bottom: none;
+      }
+
+      .user-dropdown:hover .dropdown-content,
+      .dropdown-content:hover {
+        display: block;
+      }
+
       /* Page Header */
       .page-header {
         background: linear-gradient(
@@ -729,9 +815,33 @@
             <li><a href="/#gallery">Gallery</a></li>
             <li><a href="/#team">Our Team</a></li>
             <li><a href="/#contact">Contact</a></li>
-            <!-- Admin link will be dynamically added if user is admin -->
-            <li id="userAuthSection">
-              <!-- User authentication section will be populated by JavaScript -->
+            
+            <!-- Authentication buttons (shown when not logged in) -->
+            <li class="auth-buttons" id="auth-buttons" style="display: none;">
+              <a href="/login" class="btn btn-small">Sign In</a>
+              <a href="/register" class="btn btn-small btn-gold">Sign Up</a>
+            </li>
+            
+            <!-- User menu (shown when logged in) -->
+            <li id="user-menu">
+              <div class="user-dropdown">
+                <button class="user-btn">
+                  <i class="fas fa-user-circle"></i>
+                  <span id="user-name">User</span>
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-content">
+                  <a href="/admin.html" id="admin-link" style="display: none;">
+                    <i class="fas fa-shield-alt"></i> Admin Panel
+                  </a>
+                  <a href="/my-bookings.html">
+                    <i class="fas fa-calendar-check"></i> My Bookings
+                  </a>
+                  <a href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </a>
+                </div>
+              </div>
             </li>
           </ul>
           <button class="mobile-menu-btn">
@@ -846,9 +956,7 @@
                   <div class="time-slot" data-time="14:00">2:00 PM</div>
                   <div class="time-slot" data-time="15:00">3:00 PM</div>
                   <div class="time-slot" data-time="16:00">4:00 PM</div>
-                  <div class="time-slot unavailable" data-time="17:00">
-                    5:00 PM
-                  </div>
+                  <div class="time-slot" data-time="17:00">5:00 PM</div>
                   <div class="time-slot" data-time="18:00">6:00 PM</div>
                 </div>
                 <input type="hidden" id="selectedTime" name="time" required />

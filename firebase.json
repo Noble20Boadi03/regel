@@ -21,6 +21,10 @@
         "destination": "/booking.html"
       },
       {
+        "source": "/my-bookings",
+        "destination": "/my-bookings.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
