@@ -7,7 +7,8 @@ import {
     doc, 
     getDoc, 
     getDocs, 
-    query 
+    query,
+    orderBy 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { 
     getAuth, 
@@ -168,6 +169,176 @@ let selectedServices = JSON.parse(localStorage.getItem("regelCart")) || [];
 const selectedServicesList = document.getElementById("selectedServicesList");
 const selectedServicesContainer = document.getElementById("selectedServicesContainer");
 
+// Service Selection Toggle
+const serviceSelectionToggle = document.getElementById('serviceSelectionToggle');
+const serviceSelectionContent = document.getElementById('serviceSelectionContent');
+
+if (serviceSelectionToggle) {
+    serviceSelectionToggle.addEventListener('click', () => {
+        serviceSelectionToggle.classList.toggle('active');
+        serviceSelectionContent.classList.toggle('active');
+    });
+}
+
+// Load services from Firestore
+async function loadServicesForBooking() {
+    try {
+        console.log('Loading services for booking page...');
+        
+        const categoriesQuery = query(collection(db, 'service_categories'), orderBy('category_name'));
+        const categoriesSnapshot = await getDocs(categoriesQuery);
+        
+        const servicesQuery = query(collection(db, 'services'));
+        const servicesSnapshot = await getDocs(servicesQuery);
+        
+        const servicesByCategory = {};
+        
+        servicesSnapshot.forEach(doc => {
+            const service = { id: doc.id, ...doc.data() };
+            if (service.is_active === true) {
+                if (!servicesByCategory[service.category_id]) {
+                    servicesByCategory[service.category_id] = [];
+                }
+                servicesByCategory[service.category_id].push(service);
+            }
+        });
+        
+        renderServicesForBooking(categoriesSnapshot, servicesByCategory);
+        
+    } catch (error) {
+        console.error('Error loading services:', error);
+        const container = document.getElementById('serviceCategoriesContainer');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: var(--gray);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; color: #dc3545;"></i>
+                    <p>Unable to load services. Please try again.</p>
+                </div>
+            `;
+        }
+    }
+}
+
+function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
+    const container = document.getElementById('serviceCategoriesContainer');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    let hasServices = false;
+    
+    categoriesSnapshot.forEach(categoryDoc => {
+        const category = { id: categoryDoc.id, ...categoryDoc.data() };
+        const categoryServices = servicesByCategory[category.id] || [];
+        
+        if (categoryServices.length > 0) {
+            hasServices = true;
+            
+            const categorySection = document.createElement('div');
+            categorySection.className = 'service-category-section';
+            
+            categorySection.innerHTML = `
+                <div class="category-title">
+                    <i class="${category.icon || 'fas fa-spa'}"></i>
+                    <span>${category.category_name}</span>
+                </div>
+                <div class="services-list">
+                    ${categoryServices.map(service => {
+                        const isSelected = selectedServices.some(s => s.service === service.service_name);
+                        return `
+                            <label class="service-checkbox-item ${isSelected ? 'selected' : ''}" data-service-id="${service.id}">
+                                <input type="checkbox" 
+                                    class="service-checkbox"
+                                    data-service="${service.service_name}"
+                                    data-price="${service.price || 0}"
+                                    data-duration="${service.duration || 'N/A'}"
+                                    ${isSelected ? 'checked' : ''}>
+                                <div class="service-info">
+                                    <div class="service-header">
+                                        <span class="service-name">${service.service_name}</span>
+                                        <span class="service-price">GHS${service.price || '0'}</span>
+                                    </div>
+                                    <div class="service-details">
+                                        <span><i class="far fa-clock"></i>${service.duration || 'N/A'}</span>
+                                    </div>
+                                    ${service.description ? `<div class="service-desc">${service.description}</div>` : ''}
+                                </div>
+                            </label>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            container.appendChild(categorySection);
+        }
+    });
+    
+    if (!hasServices) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--gray);">
+                <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>No services available at the moment.</p>
+            </div>
+        `;
+    }
+    
+    // Attach event listeners to checkboxes
+    attachServiceCheckboxListeners();
+    updateSelectionSummary();
+}
+
+function attachServiceCheckboxListeners() {
+    const checkboxes = document.querySelectorAll('.service-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const label = this.closest('.service-checkbox-item');
+            const serviceName = this.getAttribute('data-service');
+            const price = parseFloat(this.getAttribute('data-price'));
+            const duration = this.getAttribute('data-duration');
+            
+            if (this.checked) {
+                // Add service to selection
+                label.classList.add('selected');
+                if (!selectedServices.some(s => s.service === serviceName)) {
+                    selectedServices.push({
+                        service: serviceName,
+                        price: price,
+                        duration: duration
+                    });
+                }
+            } else {
+                // Remove service from selection
+                label.classList.remove('selected');
+                selectedServices = selectedServices.filter(s => s.service !== serviceName);
+            }
+            
+            // Update localStorage and UI
+            localStorage.setItem('regelCart', JSON.stringify(selectedServices));
+            displaySelectedServices();
+            updateSelectionSummary();
+        });
+    });
+}
+
+function updateSelectionSummary() {
+    const summaryDiv = document.getElementById('selectionSummary');
+    const countSpan = document.getElementById('selectedCount');
+    const totalSpan = document.getElementById('selectedTotal');
+    
+    if (!summaryDiv || !countSpan || !totalSpan) return;
+    
+    const count = selectedServices.length;
+    const total = selectedServices.reduce((sum, service) => sum + (parseFloat(service.price) || 0), 0);
+    
+    countSpan.textContent = count;
+    totalSpan.textContent = total.toFixed(2);
+    
+    summaryDiv.style.display = count > 0 ? 'flex' : 'none';
+}
+
+
 // Function to display selected services
 function displaySelectedServices() {
     if (!selectedServicesList) return;
@@ -175,7 +346,6 @@ function displaySelectedServices() {
     selectedServicesList.innerHTML = '';
 
     if (selectedServices.length === 0) {
-        selectedServicesList.innerHTML = '<div class="no-services">No services selected. <a href="/services">Browse services</a></div>';
         if (selectedServicesContainer) {
             selectedServicesContainer.style.display = 'none';
         }
@@ -193,7 +363,7 @@ function displaySelectedServices() {
                     <div class="selected-service-duration">${service.duration}</div>
                 </div>
                 <div style="display: flex; align-items: center;">
-                    <span class="selected-service-price">$${service.price}</span>
+                    <span class="selected-service-price">GHS${service.price}</span>
                     <button class="remove-service" data-index="${index}">
                         <i class="fas fa-times"></i>
                     </button>
@@ -219,6 +389,23 @@ function removeService(index) {
     selectedServices.splice(index, 1);
     localStorage.setItem("regelCart", JSON.stringify(selectedServices));
     displaySelectedServices();
+    updateSelectionSummary();
+    
+    // Update checkboxes to reflect removal
+    const checkboxes = document.querySelectorAll('.service-checkbox');
+    checkboxes.forEach(checkbox => {
+        const serviceName = checkbox.getAttribute('data-service');
+        const isSelected = selectedServices.some(s => s.service === serviceName);
+        checkbox.checked = isSelected;
+        const label = checkbox.closest('.service-checkbox-item');
+        if (label) {
+            if (isSelected) {
+                label.classList.add('selected');
+            } else {
+                label.classList.remove('selected');
+            }
+        }
+    });
 }
 
 // Function to calculate total duration
@@ -767,4 +954,5 @@ document.addEventListener("DOMContentLoaded", function() {
     displaySelectedServices();
     updateBookingSummary();
     checkAuthStatus();
+    loadServicesForBooking(); // Load services for integrated selection
 });

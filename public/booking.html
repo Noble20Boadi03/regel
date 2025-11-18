@@ -499,6 +499,179 @@
         font-size: 20px;
       }
 
+      /* Service Selection Section */
+      .service-selection {
+        margin-bottom: 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .service-selection-header {
+        background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+        color: white;
+        padding: 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+
+      .service-selection-header:hover {
+        background: linear-gradient(135deg, var(--emerald-light), var(--emerald));
+      }
+
+      .service-selection-header h3 {
+        color: white;
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      .service-selection-header .toggle-icon {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+      }
+
+      .service-selection-header.active .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .service-selection-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .service-selection-content.active {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .service-categories {
+        padding: 20px;
+      }
+
+      .service-category-section {
+        margin-bottom: 25px;
+      }
+
+      .service-category-section:last-child {
+        margin-bottom: 0;
+      }
+
+      .category-title {
+        color: var(--emerald);
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .category-title i {
+        color: var(--gold);
+      }
+
+      .services-list {
+        display: grid;
+        gap: 15px;
+      }
+
+      .service-checkbox-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 15px;
+        background: var(--cream);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .service-checkbox-item:hover {
+        border-color: var(--light-gray);
+        transform: translateX(5px);
+      }
+
+      .service-checkbox-item.selected {
+        border-color: var(--emerald);
+        background: rgba(212, 2, 93, 0.05);
+      }
+
+      .service-checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 15px;
+        cursor: pointer;
+        accent-color: var(--emerald);
+      }
+
+      .service-info {
+        flex: 1;
+      }
+
+      .service-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+
+      .service-name {
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 1rem;
+      }
+
+      .service-price {
+        color: var(--gold);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .service-details {
+        display: flex;
+        gap: 15px;
+        font-size: 0.85rem;
+        color: var(--gray);
+        margin-bottom: 8px;
+      }
+
+      .service-details i {
+        margin-right: 5px;
+      }
+
+      .service-desc {
+        font-size: 0.9rem;
+        color: var(--gray);
+        line-height: 1.4;
+      }
+
+      .selection-summary {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 15px 20px;
+        border-top: 2px solid var(--light-gray);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+      }
+
+      .selection-summary .total {
+        color: var(--emerald);
+        font-size: 1.2rem;
+      }
+
+      .selection-summary .count {
+        color: var(--gold);
+      }
+
       /* Selected Services Section */
       .selected-services {
         margin-bottom: 30px;
@@ -888,9 +1061,33 @@
         <!-- Booking Form (Initially Hidden) -->
         <div class="booking-container" id="bookingContainer">
           <div class="booking-form">
+            <!-- Service Selection Section -->
+            <div class="service-selection" id="serviceSelection">
+              <div class="service-selection-header" id="serviceSelectionToggle">
+                <h3><i class="fas fa-spa"></i> Select Services</h3>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+              </div>
+              <div class="service-selection-content" id="serviceSelectionContent">
+                <div class="service-categories" id="serviceCategoriesContainer">
+                  <div style="text-align: center; padding: 40px; color: var(--gray);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Loading services...</p>
+                  </div>
+                </div>
+                <div class="selection-summary" id="selectionSummary" style="display: none;">
+                  <div>
+                    <span class="count"><span id="selectedCount">0</span> service(s) selected</span>
+                  </div>
+                  <div class="total">
+                    Total: GHS<span id="selectedTotal">0.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Selected Services from Local Storage -->
-            <div class="selected-services" id="selectedServicesContainer">
-              <h3>Selected Services</h3>
+            <div class="selected-services" id="selectedServicesContainer" style="display: none;">
+              <h3><i class="fas fa-check-circle"></i> Your Selected Services</h3>
               <div id="selectedServicesList">
                 <!-- Services will be dynamically added here -->
               </div>
