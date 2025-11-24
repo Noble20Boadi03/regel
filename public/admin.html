@@ -825,13 +825,13 @@
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
                         <li><i class="fas fa-map-marker-alt"></i> Accra, Ghana</li>
-                        <li><i class="fas fa-phone"></i> 0556548737</li>
+                        <li><i class="fas fa-phone"></i> 0541893107</li>
                         <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2024 Regel Glit Glam Beauty Salon. All rights reserved.</p>
+                <p>&copy; 2025 Regel Glit Glam Beauty Salon. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -942,14 +942,39 @@
             }
 
             // Setup logout functionality
-            document.getElementById('admin-logout').addEventListener('click', function(e) {
-                e.preventDefault();
-                // Clear admin session
-                sessionStorage.removeItem('adminUser');
-                sessionStorage.removeItem('userEmail');
-                // Redirect to home page
-                window.location.href = '/';
-            });
+            const adminLogoutBtn = document.getElementById('admin-logout');
+            if (adminLogoutBtn) {
+                adminLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Confirm before logging out
+                    const confirmed = confirm('Are you sure you want to log out of the admin panel?');
+                    if (!confirmed) return;
+                    
+                    try {
+                        // Show loading state
+                        adminLogoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+                        adminLogoutBtn.style.pointerEvents = 'none';
+                        
+                        // Clear admin session
+                        sessionStorage.removeItem('adminUser');
+                        sessionStorage.removeItem('userEmail');
+                        
+                        // Success feedback
+                        adminLogoutBtn.innerHTML = '<i class="fas fa-check"></i> Logged out!';
+                        
+                        // Redirect after brief delay
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 500);
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        alert('Failed to log out. Please try again.');
+                        adminLogoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                        adminLogoutBtn.style.pointerEvents = 'auto';
+                    }
+                });
+            }
         });
 
         // Mobile Menu Toggle

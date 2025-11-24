@@ -746,8 +746,22 @@ function updateNavigationForUser(isLoggedIn, isAdmin = false) {
 }
 
 // Handle logout
-async function handleLogout() {
+async function handleLogout(e) {
+    e.preventDefault();
+    
+    // Confirm before logging out
+    const confirmed = confirm('Are you sure you want to log out?');
+    if (!confirmed) return;
+    
+    const logoutBtn = document.getElementById('logout-btn');
+    
     try {
+        // Show loading state
+        if (logoutBtn) {
+            logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+            logoutBtn.style.pointerEvents = 'none';
+        }
+        
         // Check if user is logged in via Firebase
         const user = auth.currentUser;
         if (user) {
@@ -758,12 +772,22 @@ async function handleLogout() {
         sessionStorage.removeItem('adminUser');
         sessionStorage.removeItem('userEmail');
         
-        // Redirect to home page
-        window.location.href = '/';
+        // Success feedback
+        if (logoutBtn) {
+            logoutBtn.innerHTML = '<i class="fas fa-check"></i> Logged out!';
+        }
+        
+        // Redirect after brief delay
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 500);
     } catch (error) {
-        console.error('Error during logout:', error);
-        // Still redirect even if there's an error
-        window.location.href = '/';
+        console.error('Error signing out:', error);
+        alert('Failed to log out. Please try again.');\n        
+        if (logoutBtn) {
+            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            logoutBtn.style.pointerEvents = 'auto';
+        }
     }
 }
 

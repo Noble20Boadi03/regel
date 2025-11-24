@@ -734,13 +734,13 @@
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
                         <li><i class="fas fa-map-marker-alt"></i> Accra, Ghana</li>
-                        <li><i class="fas fa-phone"></i> 0556548737</li>
+                        <li><i class="fas fa-phone"></i> 0541893107</li>
                         <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2024 Regel Glit Glam Beauty Salon. All rights reserved.</p>
+                <p>&copy; 2025 Regel Glit Glam Beauty Salon. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -832,11 +832,30 @@
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
+                
+                // Confirm before logging out
+                const confirmed = confirm('Are you sure you want to log out?');
+                if (!confirmed) return;
+                
                 try {
+                    // Show loading state
+                    logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+                    logoutBtn.style.pointerEvents = 'none';
+                    
                     await signOut(auth);
-                    window.location.href = '/';
+                    
+                    // Success feedback
+                    logoutBtn.innerHTML = '<i class="fas fa-check"></i> Logged out!';
+                    
+                    // Redirect after brief delay
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 500);
                 } catch (error) {
                     console.error('Error signing out:', error);
+                    alert('Failed to log out. Please try again.');
+                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                    logoutBtn.style.pointerEvents = 'auto';
                 }
             });
         }

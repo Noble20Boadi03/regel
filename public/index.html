@@ -1122,7 +1122,7 @@
               </div>
               <div class="contact-details">
                 <h3>Phone Number</h3>
-                <p>0556548737</p>
+                <p>0541893107</p>
               </div>
             </div>
             <div class="contact-item">
@@ -1220,13 +1220,13 @@
             <h3>Contact Info</h3>
             <ul class="footer-links">
               <li><i class="fas fa-map-marker-alt"></i> Accra, Ghana</li>
-              <li><i class="fas fa-phone"></i> 0556548737</li>
+              <li><i class="fas fa-phone"></i> 0541893107</li>
               <li><i class="far fa-envelope"></i> info@regelglitglam.com</li>
             </ul>
           </div>
         </div>
         <div class="copyright">
-          <p>&copy; 2024 Regel Glit Glam Beauty Salon. All rights reserved.</p>
+          <p>&copy; 2025 Regel Glit Glam Beauty Salon. All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -1296,11 +1296,39 @@
       document.addEventListener('click', function(e) {
         if (e.target.id === 'logout-btn') {
           e.preventDefault();
+          
+          // Confirm before logging out
+          const confirmed = confirm('Are you sure you want to log out?');
+          if (!confirmed) return;
+          
+          const logoutBtn = document.getElementById('logout-btn');
+          
+          // Show loading state
+          if (logoutBtn) {
+            logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+            logoutBtn.style.pointerEvents = 'none';
+          }
+          
           signOut(auth).then(() => {
+            // Success feedback
+            if (logoutBtn) {
+              logoutBtn.innerHTML = '<i class="fas fa-check"></i> Logged out!';
+            }
             showNotification('Logged out successfully!', 'success');
+            
+            // Redirect after brief delay
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
           }).catch((error) => {
             console.error('Logout error:', error);
             showNotification('Logout failed. Please try again.', 'error');
+            
+            // Restore button
+            if (logoutBtn) {
+              logoutBtn.innerHTML = 'Logout';
+              logoutBtn.style.pointerEvents = 'auto';
+            }
           });
         }
       });
