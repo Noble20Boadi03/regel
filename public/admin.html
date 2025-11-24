@@ -1169,11 +1169,13 @@
                     
                     const servicesCount = booking.services ? booking.services.length : 0;
                     
+                    const customerName = `${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}`;
+                    
                     const row = `
                         <tr>
                             <td>${doc.id.substring(0, 8)}...</td>
                             <td>
-                                <strong>${booking.customer_info?.first_name || 'N/A'} ${booking.customer_info?.last_name || ''}</strong><br>
+                                <strong>${customerName}</strong><br>
                                 <small>${booking.customer_info?.email || 'No email'}</small>
                             </td>
                             <td>
@@ -1188,13 +1190,17 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="action-buttons">
-                                    <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px;">
+                                <div class="action-buttons" style="display: flex; gap: 8px; align-items: center;">
+                                    <select class="form-control" onchange="updateBookingStatus('${doc.id}', this.value)" style="padding: 5px; font-size: 14px; flex: 1;">
                                         <option value="Pending" ${(booking.status || 'Pending') === 'Pending' ? 'selected' : ''}>Pending</option>
                                         <option value="Confirmed" ${(booking.status || 'Pending') === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
                                         <option value="Completed" ${(booking.status || 'Pending') === 'Completed' ? 'selected' : ''}>Completed</option>
                                         <option value="Cancelled" ${(booking.status || 'Pending') === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                                     </select>
+                                    <button class="btn btn-danger btn-small" onclick="deleteBooking('${doc.id}', '${customerName.replace(/'/g, "\\'")}')"
+                                            title="Delete booking" style="padding: 6px 12px;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -1372,6 +1378,27 @@
                 if (!silent) {
                     alert('Error updating booking status');
                 }
+            }
+        };
+
+        // Delete Booking
+        window.deleteBooking = async function(bookingId, customerName) {
+            // Confirm deletion
+            const confirmDelete = confirm(`Are you sure you want to permanently delete the booking for ${customerName}?\n\nThis action cannot be undone.`);
+            
+            if (!confirmDelete) {
+                return;
+            }
+            
+            try {
+                const bookingRef = doc(db, 'bookings', bookingId);
+                await deleteDoc(bookingRef);
+                alert('Booking deleted successfully!');
+                loadBookings();
+                loadStatistics();
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+                alert('Error deleting booking. Please try again.');
             }
         };
 
