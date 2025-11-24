@@ -12,8 +12,6 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Add CSP header to allow Firebase to work properly -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com/ajax/libs/font-awesome/ https://fonts.googleapis.com https://firestore.googleapis.com;">
     <style>
       :root {
         --emerald: #d4025d;
@@ -1063,11 +1061,11 @@
           <div class="booking-form">
             <!-- Service Selection Section -->
             <div class="service-selection" id="serviceSelection">
-              <div class="service-selection-header" id="serviceSelectionToggle">
+              <div class="service-selection-header active" id="serviceSelectionToggle">
                 <h3><i class="fas fa-spa"></i> Select Services</h3>
                 <i class="fas fa-chevron-down toggle-icon"></i>
               </div>
-              <div class="service-selection-content" id="serviceSelectionContent">
+              <div class="service-selection-content active" id="serviceSelectionContent">
                 <div class="service-categories" id="serviceCategoriesContainer">
                   <div style="text-align: center; padding: 40px; color: var(--gray);">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
@@ -1169,9 +1167,12 @@
                 ></textarea>
               </div>
 
-              <button type="submit" class="btn btn-gold" style="width: 100%">
-                Book Appointment
+              <button type="submit" class="btn btn-gold" id="bookingSubmitBtn" style="width: 100%">
+                <i class="fas fa-calendar-check"></i> Book Appointment
               </button>
+              <p id="serviceWarning" style="display: none; color: #dc3545; text-align: center; margin-top: 10px; font-weight: 600;">
+                <i class="fas fa-exclamation-triangle"></i> Please select at least one service above
+              </p>
             </form>
           </div>
 
@@ -1314,6 +1315,6 @@
       </div>
     </div>
 
-    <script type="module" src="/booking.js"></script>
+    <script type="module" src="/booking.js?v=2024111701"></script>
   </body>
 </html>

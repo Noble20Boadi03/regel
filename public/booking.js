@@ -182,14 +182,23 @@ if (serviceSelectionToggle) {
 
 // Load services from Firestore
 async function loadServicesForBooking() {
+    const container = document.getElementById('serviceCategoriesContainer');
+    
     try {
         console.log('Loading services for booking page...');
         
+        if (!container) {
+            console.error('Service categories container not found!');
+            return;
+        }
+        
         const categoriesQuery = query(collection(db, 'service_categories'), orderBy('category_name'));
         const categoriesSnapshot = await getDocs(categoriesQuery);
+        console.log('Categories loaded:', categoriesSnapshot.size);
         
         const servicesQuery = query(collection(db, 'services'));
         const servicesSnapshot = await getDocs(servicesQuery);
+        console.log('Services loaded:', servicesSnapshot.size);
         
         const servicesByCategory = {};
         
@@ -203,16 +212,18 @@ async function loadServicesForBooking() {
             }
         });
         
+        console.log('Active services by category:', servicesByCategory);
         renderServicesForBooking(categoriesSnapshot, servicesByCategory);
         
     } catch (error) {
         console.error('Error loading services:', error);
-        const container = document.getElementById('serviceCategoriesContainer');
+        console.error('Error details:', error.message, error.stack);
         if (container) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 20px; color: var(--gray);">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; color: #dc3545;"></i>
                     <p>Unable to load services. Please try again.</p>
+                    <p style="font-size: 0.85rem; color: #999;">${error.message}</p>
                 </div>
             `;
         }
@@ -222,7 +233,12 @@ async function loadServicesForBooking() {
 function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
     const container = document.getElementById('serviceCategoriesContainer');
     
-    if (!container) return;
+    console.log('Rendering services...', { container, categoriesCount: categoriesSnapshot.size });
+    
+    if (!container) {
+        console.error('Cannot render - container not found');
+        return;
+    }
     
     container.innerHTML = '';
     
@@ -232,11 +248,43 @@ function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
         const category = { id: categoryDoc.id, ...categoryDoc.data() };
         const categoryServices = servicesByCategory[category.id] || [];
         
+        console.log(`Category: ${category.category_name}, Services: ${categoryServices.length}`);
+        
         if (categoryServices.length > 0) {
             hasServices = true;
             
             const categorySection = document.createElement('div');
             categorySection.className = 'service-category-section';
+            
+            let servicesHTML = '';
+            categoryServices.forEach(service => {
+                const isSelected = selectedServices.some(s => s.service === service.service_name);
+                const serviceName = service.service_name || '';
+                const servicePrice = service.price || 0;
+                const serviceDuration = service.duration || 'N/A';
+                const serviceDesc = service.description || '';
+                
+                servicesHTML += `
+                    <label class="service-checkbox-item ${isSelected ? 'selected' : ''}" data-service-id="${service.id}">
+                        <input type="checkbox" 
+                            class="service-checkbox"
+                            data-service="${serviceName}"
+                            data-price="${servicePrice}"
+                            data-duration="${serviceDuration}"
+                            ${isSelected ? 'checked' : ''}>
+                        <div class="service-info">
+                            <div class="service-header">
+                                <span class="service-name">${serviceName}</span>
+                                <span class="service-price">GHS${servicePrice}</span>
+                            </div>
+                            <div class="service-details">
+                                <span><i class="far fa-clock"></i> ${serviceDuration}</span>
+                            </div>
+                            ${serviceDesc ? `<div class="service-desc">${serviceDesc}</div>` : ''}
+                        </div>
+                    </label>
+                `;
+            });
             
             categorySection.innerHTML = `
                 <div class="category-title">
@@ -244,29 +292,7 @@ function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
                     <span>${category.category_name}</span>
                 </div>
                 <div class="services-list">
-                    ${categoryServices.map(service => {
-                        const isSelected = selectedServices.some(s => s.service === service.service_name);
-                        return `
-                            <label class="service-checkbox-item ${isSelected ? 'selected' : ''}" data-service-id="${service.id}">
-                                <input type="checkbox" 
-                                    class="service-checkbox"
-                                    data-service="${service.service_name}"
-                                    data-price="${service.price || 0}"
-                                    data-duration="${service.duration || 'N/A'}"
-                                    ${isSelected ? 'checked' : ''}>
-                                <div class="service-info">
-                                    <div class="service-header">
-                                        <span class="service-name">${service.service_name}</span>
-                                        <span class="service-price">GHS${service.price || '0'}</span>
-                                    </div>
-                                    <div class="service-details">
-                                        <span><i class="far fa-clock"></i>${service.duration || 'N/A'}</span>
-                                    </div>
-                                    ${service.description ? `<div class="service-desc">${service.description}</div>` : ''}
-                                </div>
-                            </label>
-                        `;
-                    }).join('')}
+                    ${servicesHTML}
                 </div>
             `;
             
@@ -326,6 +352,7 @@ function updateSelectionSummary() {
     const summaryDiv = document.getElementById('selectionSummary');
     const countSpan = document.getElementById('selectedCount');
     const totalSpan = document.getElementById('selectedTotal');
+    const serviceWarning = document.getElementById('serviceWarning');
     
     if (!summaryDiv || !countSpan || !totalSpan) return;
     
@@ -336,6 +363,11 @@ function updateSelectionSummary() {
     totalSpan.textContent = total.toFixed(2);
     
     summaryDiv.style.display = count > 0 ? 'flex' : 'none';
+    
+    // Update warning visibility
+    if (serviceWarning) {
+        serviceWarning.style.display = count === 0 ? 'block' : 'none';
+    }
 }
 
 
@@ -344,14 +376,26 @@ function displaySelectedServices() {
     if (!selectedServicesList) return;
 
     selectedServicesList.innerHTML = '';
+    
+    // Update warning message
+    const serviceWarning = document.getElementById('serviceWarning');
+    const submitBtn = document.getElementById('bookingSubmitBtn');
 
     if (selectedServices.length === 0) {
         if (selectedServicesContainer) {
             selectedServicesContainer.style.display = 'none';
         }
+        // Show warning
+        if (serviceWarning) {
+            serviceWarning.style.display = 'block';
+        }
     } else {
         if (selectedServicesContainer) {
             selectedServicesContainer.style.display = 'block';
+        }
+        // Hide warning
+        if (serviceWarning) {
+            serviceWarning.style.display = 'none';
         }
         
         selectedServices.forEach((service, index) => {
@@ -507,7 +551,31 @@ if (bookingForm) {
 
         // Validate form
         if (selectedServices.length === 0) {
-            alert("Please select at least one service from the services page");
+            alert("Please select at least one service before booking!");
+            
+            // Scroll to and open service selection section
+            const serviceSelection = document.getElementById('serviceSelection');
+            const serviceSelectionToggle = document.getElementById('serviceSelectionToggle');
+            const serviceSelectionContent = document.getElementById('serviceSelectionContent');
+            
+            if (serviceSelection) {
+                serviceSelection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            // Ensure dropdown is open
+            if (serviceSelectionToggle && serviceSelectionContent) {
+                serviceSelectionToggle.classList.add('active');
+                serviceSelectionContent.classList.add('active');
+            }
+            
+            // Highlight the section
+            if (serviceSelection) {
+                serviceSelection.style.border = '3px solid #dc3545';
+                setTimeout(() => {
+                    serviceSelection.style.border = '';
+                }, 2000);
+            }
+            
             return;
         }
 
@@ -783,7 +851,8 @@ async function handleLogout(e) {
         }, 500);
     } catch (error) {
         console.error('Error signing out:', error);
-        alert('Failed to log out. Please try again.');\n        
+        alert('Failed to log out. Please try again.');
+        
         if (logoutBtn) {
             logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
             logoutBtn.style.pointerEvents = 'auto';
