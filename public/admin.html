@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RP88HRW1L5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RP88HRW1L5');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Regel Glit Glam</title>
@@ -224,11 +233,34 @@
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 2, 93, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(212, 2, 93, 0.15);
+        }
+
+        .stat-card:active {
+            transform: translateY(-3px);
         }
 
         .stat-icon {
@@ -648,33 +680,40 @@
         <div class="container">
             <!-- Statistics Cards -->
             <div class="admin-stats">
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterBookings('all')" title="Click to view all bookings">
                     <div class="stat-icon">
                         <i class="far fa-calendar-check"></i>
                     </div>
                     <div class="stat-number" id="total-bookings">0</div>
                     <div class="stat-label">Total Bookings</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterBookings('pending')" title="Click to view pending bookings">
                     <div class="stat-icon">
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="stat-number" id="pending-bookings">0</div>
                     <div class="stat-label">Pending Bookings</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="showTab('services')" title="Click to manage services">
                     <div class="stat-icon">
                         <i class="fas fa-spa"></i>
                     </div>
                     <div class="stat-number" id="total-services">0</div>
                     <div class="stat-label">Active Services</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="showTab('customers')" title="Click to view customers">
                     <div class="stat-icon">
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-number" id="total-customers">0</div>
                     <div class="stat-label">Total Customers</div>
+                </div>
+                <div class="stat-card" onclick="filterBookings('all')" title="Site visits are tracked automatically">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-number" id="site-visits">0</div>
+                    <div class="stat-label">Site Visits</div>
                 </div>
             </div>
 
@@ -915,6 +954,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Track page visit for admin page
+        async function trackAdminVisit() {
+            try {
+                const visitData = {
+                    page: window.location.pathname,
+                    url: window.location.href,
+                    referrer: document.referrer || 'Direct',
+                    timestamp: new Date(),
+                    userAgent: navigator.userAgent,
+                    screenResolution: `${window.screen.width}x${window.screen.height}`
+                };
+                await addDoc(collection(db, 'site_visits'), visitData);
+            } catch (error) {
+                console.error('Error tracking admin visit:', error);
+            }
+        }
+
         // Check if user is admin (using sessionStorage from login)
         document.addEventListener('DOMContentLoaded', function() {
             // Check admin authentication
@@ -926,6 +982,9 @@
                 window.location.href = '/login';
                 return;
             }
+
+            // Track visit
+            trackAdminVisit();
 
             // Load admin content
             loadStatistics();
@@ -1012,7 +1071,35 @@
             
             // Show selected tab and activate button
             document.getElementById(`${tabName}-tab`).classList.add('active');
-            event.currentTarget.classList.add('active');
+            
+            // Find and activate the corresponding tab button
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(tabName)) {
+                    btn.classList.add('active');
+                }
+            });
+        };
+
+        // Filter Bookings from Stat Cards
+        window.filterBookings = function(filterType) {
+            // First, switch to bookings tab
+            showTab('bookings');
+            
+            // Then apply the filter
+            const filterSelect = document.getElementById('booking-filter');
+            if (filterSelect) {
+                filterSelect.value = filterType;
+                loadBookings();
+            }
+            
+            // Scroll to bookings section smoothly
+            setTimeout(() => {
+                const bookingsTab = document.getElementById('bookings-tab');
+                if (bookingsTab) {
+                    bookingsTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         };
 
         // Modal Management
@@ -1053,10 +1140,16 @@
                 const bookingsSnapshot = await getDocs(bookingsQuery);
                 document.getElementById('total-bookings').textContent = bookingsSnapshot.size;
                 
-                // Pending Bookings
-                const pendingQuery = query(collection(db, 'bookings'), where('status', '==', 'Pending'));
-                const pendingSnapshot = await getDocs(pendingQuery);
-                document.getElementById('pending-bookings').textContent = pendingSnapshot.size;
+                // Pending Bookings - count both 'Pending' and 'pending' for case insensitivity
+                let pendingCount = 0;
+                bookingsSnapshot.forEach(doc => {
+                    const booking = doc.data();
+                    const status = (booking.status || '').toLowerCase();
+                    if (status === 'pending') {
+                        pendingCount++;
+                    }
+                });
+                document.getElementById('pending-bookings').textContent = pendingCount;
                 
                 // Active Services
                 const servicesQuery = query(collection(db, 'services'), where('is_active', '==', true));
@@ -1073,6 +1166,11 @@
                 });
                 document.getElementById('total-customers').textContent = customers.size;
                 
+                // Site Visits
+                const visitsQuery = query(collection(db, 'site_visits'));
+                const visitsSnapshot = await getDocs(visitsQuery);
+                document.getElementById('site-visits').textContent = visitsSnapshot.size;
+                
             } catch (error) {
                 console.error('Error loading statistics:', error);
                 // Fallback to mock data if Firebase fails
@@ -1080,6 +1178,7 @@
                 document.getElementById('pending-bookings').textContent = '0';
                 document.getElementById('total-services').textContent = '0';
                 document.getElementById('total-customers').textContent = '0';
+                document.getElementById('site-visits').textContent = '0';
             }
         }
 

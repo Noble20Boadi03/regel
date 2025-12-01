@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RP88HRW1L5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RP88HRW1L5');
+    </script>
+    
+    <!-- Track Page Visits -->
+    <script type="module" src="/track-visit.js"></script>
+    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Regel Glit Glam | Premium Beauty Salon</title>
@@ -303,6 +315,10 @@
         margin: 0 auto;
       }
 
+      .booking .section-title p {
+        color: white;
+      }
+
       .services-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -315,6 +331,10 @@
         overflow: hidden;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
       }
 
       .service-card:hover {
@@ -860,7 +880,7 @@
           </p>
         </div>
         <div class="services-grid">
-          <div class="service-card">
+          <a href="/services.html#H2jwyGhC89WKJW6wnX5E" class="service-card" title="View Hair & Wigs services">
             <div
               class="service-img"
               style="
@@ -875,8 +895,8 @@
               </p>
               <div class="service-price">From 250 cedis</div>
             </div>
-          </div>
-          <div class="service-card">
+          </a>
+          <a href="/services.html#ybpxIPaJD02LxmcGPid9" class="service-card" title="View Nail Care services">
             <div
               class="service-img"
               style="
@@ -891,8 +911,8 @@
               </p>
               <div class="service-price">From 50 cedis</div>
             </div>
-          </div>
-          <div class="service-card">
+          </a>
+          <a href="/services.html#GVwXk22annnXurPdmcfV" class="service-card" title="View Makeup & Beauty services">
             <div
               class="service-img"
               style="
@@ -908,8 +928,8 @@
               </p>
               <div class="service-price">From 150 cedis</div>
             </div>
-          </div>
-          <div class="service-card">
+          </a>
+          <a href="/services.html#ybpxIPaJD02LxmcGPid9" class="service-card" title="View Nail Care services">
             <div
               class="service-img"
               style="
@@ -924,7 +944,7 @@
               </p>
               <div class="service-price">From 20 cedis</div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </section>

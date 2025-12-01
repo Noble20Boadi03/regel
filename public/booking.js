@@ -254,7 +254,8 @@ function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
             hasServices = true;
             
             const categorySection = document.createElement('div');
-            categorySection.className = 'service-category-section';
+            categorySection.className = 'service-category-wrapper';
+            categorySection.id = category.id;
             
             let servicesHTML = '';
             categoryServices.forEach(service => {
@@ -287,12 +288,17 @@ function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
             });
             
             categorySection.innerHTML = `
-                <div class="category-title">
-                    <i class="${category.icon || 'fas fa-spa'}"></i>
-                    <span>${category.category_name}</span>
+                <div class="category-header-booking" data-category-id="${category.id}">
+                    <h3>
+                        <i class="${category.icon || 'fas fa-spa'}"></i>
+                        ${category.category_name}
+                    </h3>
+                    <i class="fas fa-chevron-down category-icon"></i>
                 </div>
-                <div class="services-list">
-                    ${servicesHTML}
+                <div class="category-content-booking">
+                    <div class="services-list">
+                        ${servicesHTML}
+                    </div>
                 </div>
             `;
             
@@ -309,9 +315,37 @@ function renderServicesForBooking(categoriesSnapshot, servicesByCategory) {
         `;
     }
     
+    // Attach event listeners to category headers for toggle
+    attachCategoryToggleListeners();
+    
     // Attach event listeners to checkboxes
     attachServiceCheckboxListeners();
     updateSelectionSummary();
+}
+
+function attachCategoryToggleListeners() {
+    document.querySelectorAll('.category-header-booking').forEach(header => {
+        header.addEventListener('click', function() {
+            const categoryId = this.getAttribute('data-category-id');
+            toggleCategoryBooking(categoryId);
+        });
+    });
+}
+
+function toggleCategoryBooking(categoryId) {
+    const categoryWrapper = document.getElementById(categoryId);
+    if (!categoryWrapper) return;
+    
+    const categoryContent = categoryWrapper.querySelector('.category-content-booking');
+    const categoryIcon = categoryWrapper.querySelector('.category-icon');
+    
+    if (categoryContent.classList.contains('active')) {
+        categoryContent.classList.remove('active');
+        categoryIcon.style.transform = 'rotate(0deg)';
+    } else {
+        categoryContent.classList.add('active');
+        categoryIcon.style.transform = 'rotate(180deg)';
+    }
 }
 
 function attachServiceCheckboxListeners() {

@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RP88HRW1L5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RP88HRW1L5');
+    </script>
+    
+    <!-- Track Page Visits -->
+    <script type="module" src="/track-visit.js"></script>
+    
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book Appointment | Regel Glit Glam</title>
@@ -287,6 +299,9 @@
       .page-header p {
         font-size: 1.2rem;
         max-width: 600px;
+        color: #ffffff;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        font-weight: 500;
       }
 
       /* Booking Section */
@@ -551,27 +566,57 @@
         padding: 20px;
       }
 
-      .service-category-section {
-        margin-bottom: 25px;
+      .service-category-wrapper {
+        margin-bottom: 20px;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
       }
 
-      .service-category-section:last-child {
+      .service-category-wrapper:last-child {
         margin-bottom: 0;
       }
 
-      .category-title {
-        color: var(--emerald);
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid var(--light-gray);
+      .category-header-booking {
+        background: linear-gradient(135deg, var(--emerald) 0%, #FF91A4 100%);
+        color: white;
+        padding: 20px 25px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+
+      .category-header-booking:hover {
+        opacity: 0.95;
+      }
+
+      .category-header-booking h3 {
+        font-size: 1.3rem;
+        margin: 0;
+        color: white;
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
-      .category-title i {
-        color: var(--gold);
+      .category-icon {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+      }
+
+      .category-content-booking {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.5s ease;
+      }
+
+      .category-content-booking.active {
+        padding: 20px;
+        max-height: 3000px;
       }
 
       .services-list {
@@ -952,6 +997,8 @@
 
         .page-header p {
           font-size: 1rem;
+          color: #ffffff;
+          text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
         }
 
         .btn {

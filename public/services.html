@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RP88HRW1L5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RP88HRW1L5');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Services | Regel Glit Glam</title>
@@ -1011,6 +1020,24 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    // Track page visit
+    async function trackPageVisit() {
+        try {
+            await addDoc(collection(db, 'site_visits'), {
+                page: window.location.pathname,
+                url: window.location.href,
+                referrer: document.referrer || 'Direct',
+                timestamp: new Date(),
+                userAgent: navigator.userAgent,
+                screenResolution: `${window.screen.width}x${window.screen.height}`
+            });
+        } catch (error) {
+            console.warn('Visit tracking skipped:', error.message);
+        }
+    }
+    // Track visit with delay
+    setTimeout(trackPageVisit, 1000);
+
     // Mobile Menu Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
@@ -1034,24 +1061,33 @@
 
     // Toggle Service Categories - SINGLE DECLARATION
     const toggleCategory = function(categoryId) {
-        const category = document.getElementById(categoryId);
-        if (!category) {
+        console.log('Toggle category called with ID:', categoryId);
+        const categoryWrapper = document.getElementById(categoryId);
+        if (!categoryWrapper) {
             console.error('Category not found:', categoryId);
             return;
         }
         
-        const categoryHeader = category.closest('.service-category')?.querySelector('.category-header');
-        if (!categoryHeader) return;
+        console.log('Category wrapper found:', categoryWrapper);
+        const categoryContent = categoryWrapper.querySelector('.category-content');
+        const categoryHeader = categoryWrapper.querySelector('.category-header');
+        const icon = categoryHeader?.querySelector('.category-icon i');
         
-        const icon = categoryHeader.querySelector('.category-icon i');
+        if (!categoryContent) {
+            console.error('Category content not found');
+            return;
+        }
         
-        category.classList.toggle('active');
+        console.log('Toggling active class. Current state:', categoryContent.classList.contains('active'));
+        categoryContent.classList.toggle('active');
         
-        if (category.classList.contains('active')) {
-            icon.className = 'fas fa-chevron-up';
+        if (categoryContent.classList.contains('active')) {
+            if (icon) icon.className = 'fas fa-chevron-up';
             window.history.replaceState(null, null, `#${categoryId}`);
+            console.log('Category expanded');
         } else {
-            icon.className = 'fas fa-chevron-down';
+            if (icon) icon.className = 'fas fa-chevron-down';
+            console.log('Category collapsed');
         }
     };
 
@@ -1285,19 +1321,20 @@
             const category = { id: categoryDoc.id, ...categoryDoc.data() };
             const categoryServices = servicesByCategory[category.id] || [];
             
+            console.log('Rendering category:', category.category_name, 'with ID:', category.id);
+            
             if (categoryServices.length > 0) {
                 hasServices = true;
                 const categoryHTML = `
-                    <div class="service-category">
+                    <div class="service-category" id="${category.id}">
                         <div class="category-header" data-category-id="${category.id}">
                             <h3><i class="${category.icon || 'fas fa-spa'}"></i> ${category.category_name}</h3>
                             <div class="category-icon">
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                         </div>
-                        <div class="category-content" id="${category.id}">
-                            <div class="services-grid">
-                                ${categoryServices.map(service => `
+                        <div class="category-content">
+                            <div class="services-grid">${categoryServices.map(service => `
                                     <div class="service-item">
                                         <div class="service-name">
                                             <span>${service.service_name}</span>
@@ -1345,7 +1382,28 @@
         if (categoriesSnapshot.docs.length > 0) {
             const firstCategory = categoriesSnapshot.docs[0];
             setTimeout(() => {
-                toggleCategory(firstCategory.id);
+                // Handle hash navigation after services load
+                if (window.location.hash) {
+                    const hash = window.location.hash.substring(1);
+                    console.log('Hash detected:', hash);
+                    const targetElement = document.getElementById(hash);
+                    if (targetElement) {
+                        console.log('Target element found:', targetElement);
+                        // Open the category - hash is the category ID
+                        toggleCategory(hash);
+                        // Scroll to the section
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 300);
+                    } else {
+                        console.log('Target element not found for hash:', hash);
+                        // If hash not found, open first category
+                        toggleCategory(firstCategory.id);
+                    }
+                } else {
+                    // No hash, open first category by default
+                    toggleCategory(firstCategory.id);
+                }
             }, 100);
         }
     }
