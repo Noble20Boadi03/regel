@@ -529,7 +529,7 @@ function updateBookingSummary() {
         
         const totalPrice = selectedServices.reduce((sum, item) => sum + parseFloat(item.price), 0);
         const summaryTotal = document.getElementById("summary-total");
-        if (summaryTotal) summaryTotal.textContent = `$${totalPrice.toFixed(2)}`;
+        if (summaryTotal) summaryTotal.textContent = `₵${totalPrice.toFixed(2)}`;
         
         const totalDuration = calculateTotalDuration();
         const summaryDuration = document.getElementById("summary-duration");
@@ -733,7 +733,7 @@ if (bookingForm) {
                 document.getElementById('confirm-services').textContent = serviceNames;
                 document.getElementById('confirm-date').textContent = formattedDate;
                 document.getElementById('confirm-time').textContent = displayTime;
-                document.getElementById('confirm-total').textContent = `$${totalPrice.toFixed(2)}`;
+                document.getElementById('confirm-total').textContent = `₵${totalPrice.toFixed(2)}`;
 
                 // Show confirmation modal
                 confirmationModal.style.display = "flex";
@@ -1042,7 +1042,7 @@ Booking ID: ${bookingDetails.bookingId}
 Services: ${bookingDetails.services}
 Date: ${bookingDetails.date}
 Time: ${bookingDetails.time}
-Total: GHS ${bookingDetails.total.toFixed(2)}
+Total: ₵${bookingDetails.total.toFixed(2)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 IMPORTANT INFORMATION
